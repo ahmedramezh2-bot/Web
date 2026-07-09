@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>HEBRA — Designed to Feel Like Another Dimension</title>
+  <meta name="description" content="HEBRA is a premium digital studio. We shape darkness into interfaces — cinematic websites, custom applications and UI/UX crafted to feel like another dimension." />
+  <meta name="theme-color" content="#050507" />
+  <meta property="og:title" content="HEBRA — Digital Studio" />
+  <meta property="og:description" content="In the beginning, there was darkness. Then, a signal. Premium websites, applications and design from another dimension." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23050507'/%3E%3Crect x='26' y='14' width='12' height='36' fill='none' stroke='%23EDEDF0' stroke-width='2'/%3E%3C/svg%3E" />
+
+  <link rel="preload" href="assets/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/fonts/cormorant-garamond-italic.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="assets/css/fonts.css" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <script>document.documentElement.classList.replace('no-js','js');</script>
+</head>
+<body data-loading="true">
+
+  <a class="skip-link" href="#origin">Skip to content</a>
+
+  <!-- ================= PRELOADER ================= -->
+  <div class="preloader" id="preloader" aria-hidden="false" role="status" aria-label="Loading HEBRA">
+    <div class="preloader__frame" aria-hidden="true">
+      <span class="preloader__corner preloader__corner--tl"></span>
+      <span class="preloader__corner preloader__corner--tr"></span>
+      <span class="preloader__corner preloader__corner--bl"></span>
+      <span class="preloader__corner preloader__corner--br"></span>
+    </div>
+    <p class="preloader__whisper" id="preloader-whisper">
+      <span class="preloader__whisper-line">In the beginning, there was darkness.</span>
+    </p>
+    <div class="preloader__meta" aria-hidden="true">
+      <span class="preloader__label">H&thinsp;E&thinsp;B&thinsp;R&thinsp;A</span>
+      <span class="preloader__counter" id="preloader-counter">0&thinsp;0&thinsp;0</span>
+    </div>
+    <div class="preloader__beam" id="preloader-beam" aria-hidden="true"></div>
+    <button class="preloader__skip" id="preloader-skip" type="button">Enter</button>
+  </div>
+
+  <!-- ================= FIXED WEBGL STAGE (loader + backdrop share one context) ================= -->
+  <canvas class="gl-stage is-front" id="gl-stage" aria-hidden="true"></canvas>
+
+  <!-- ================= HEADER ================= -->
+  <header class="header" id="header">
+    <a class="header__mark" href="#origin" aria-label="HEBRA — back to the beginning">
+      <span aria-hidden="true">H&thinsp;E&thinsp;B&thinsp;R&thinsp;A</span>
+    </a>
+    <div class="header__status" aria-hidden="true">
+      <span class="header__status-dot"></span>
+      <span class="header__status-text" id="header-section-label">001 — ORIGIN</span>
+    </div>
+    <button class="header__menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
+      <span class="header__menu-label" data-open-label="MENU" data-close-label="CLOSE">MENU</span>
+      <span class="header__menu-icon" aria-hidden="true"><i></i><i></i></span>
+    </button>
+    <span class="header__progress" id="scroll-progress" aria-hidden="true"></span>
+  </header>
+
+  <!-- ================= FULLSCREEN MENU ================= -->
+  <nav class="menu" id="menu" aria-hidden="true" aria-label="Main navigation">
+    <div class="menu__veil" aria-hidden="true"></div>
+    <div class="menu__inner">
+      <ol class="menu__list">
+        <li class="menu__item"><a class="menu__link" href="#origin"><span class="menu__index">001</span><span class="menu__word">Origin</span></a></li>
+        <li class="menu__item"><a class="menu__link" href="#manifesto"><span class="menu__index">002</span><span class="menu__word">Manifesto</span></a></li>
+        <li class="menu__item"><a class="menu__link" href="#craft"><span class="menu__index">003</span><span class="menu__word">Craft</span></a></li>
+        <li class="menu__item"><a class="menu__link" href="#mind"><span class="menu__index">004</span><span class="menu__word">Mind</span></a></li>
+        <li class="menu__item"><a class="menu__link" href="#ritual"><span class="menu__index">005</span><span class="menu__word">Ritual</span></a></li>
+        <li class="menu__item"><a class="menu__link" href="#transmission"><span class="menu__index">006</span><span class="menu__word">Transmission</span></a></li>
+      </ol>
+      <p class="menu__foot">
+        <em>Designed to feel like another dimension.</em>
+        <a href="mailto:studio@hebra.dev" class="menu__mail">studio@hebra.dev</a>
+      </p>
+    </div>
+  </nav>
+
+  <main id="main">
+
+    <!-- ================= 001 / ORIGIN (HERO) ================= -->
+    <section class="origin section" id="origin" data-section-label="001 — ORIGIN">
+      <div class="origin__stage">
+        <div class="origin__emblem" id="origin-emblem" aria-hidden="true">
+          <svg viewBox="0 0 400 400" fill="none" preserveAspectRatio="xMidYMid meet">
+            <circle cx="200" cy="200" r="168" stroke="currentColor" stroke-opacity="0.22" stroke-width="1"/>
+            <circle cx="200" cy="200" r="168" class="origin__orbit" stroke="currentColor" stroke-opacity="0.6" stroke-width="1" stroke-dasharray="4 1051"/>
+            <rect x="86" y="86" width="228" height="228" stroke="currentColor" stroke-opacity="0.14" stroke-width="1"/>
+            <rect x="164" y="104" width="72" height="192" class="origin__monolith" stroke="currentColor" stroke-opacity="0.55" stroke-width="1.2"/>
+            <circle cx="200" cy="200" r="1.8" fill="currentColor"/>
+          </svg>
+        </div>
+        <h1 class="origin__title">
+          <span class="origin__title-line" aria-hidden="true">
+            <b>H</b><b>E</b><b>B</b><b>R</b><b>A</b>
+          </span>
+          <span class="visually-hidden">HEBRA</span>
+        </h1>
+        <p class="origin__sub">
+          <em>A digital studio from another dimension.</em>
+        </p>
+        <p class="origin__whisper" aria-hidden="true">In the beginning, there was darkness.</p>
+      </div>
+      <div class="origin__foot">
+        <span class="origin__coord" aria-hidden="true">29.9773° N&ensp;/&ensp;31.1325° E</span>
+        <a class="origin__scrollcue" href="#manifesto">
+          <span class="origin__scrollcue-text">Scroll</span>
+          <span class="origin__scrollcue-line" aria-hidden="true"></span>
+        </a>
+        <span class="origin__index" aria-hidden="true">0&thinsp;0&thinsp;1</span>
+      </div>
+    </section>
+
+    <!-- ================= 002 / MANIFESTO ================= -->
+    <section class="manifesto section" id="manifesto" data-section-label="002 — MANIFESTO">
+      <div class="manifesto__rays" aria-hidden="true"></div>
+      <header class="section-head">
+        <span class="section-head__index">002</span>
+        <span class="section-head__rule"></span>
+        <h2 class="section-head__title">Manifesto</h2>
+      </header>
+      <div class="manifesto__body">
+        <p class="manifesto__line"><em>In the beginning, there was darkness.</em></p>
+        <p class="manifesto__line"><em>Then — a signal.</em></p>
+        <p class="manifesto__line"><em>We learned to shape darkness into light,<br/>and light into interfaces.</em></p>
+      </div>
+      <div class="manifesto__statement">
+        <p>HEBRA is a studio for those who believe a website is not a page — it is a place. Every pixel is placed with intention. Every motion has a purpose. We build digital environments that feel inevitable: quiet, precise, and slightly unreal.</p>
+        <p>We do not decorate. We <em>engineer atmosphere.</em></p>
+      </div>
+    </section>
+
+    <!-- ================= 003 / CRAFT (SERVICES) ================= -->
+    <section class="craft section" id="craft" data-section-label="003 — CRAFT">
+      <header class="section-head">
+        <span class="section-head__index">003</span>
+        <span class="section-head__rule"></span>
+        <h2 class="section-head__title">Craft</h2>
+        <p class="section-head__note"><em>Thirteen disciplines. One obsession.</em></p>
+      </header>
+
+      <!-- Flagship trio -->
+      <div class="craft__flagships">
+        <article class="flagship" data-tilt>
+          <span class="flagship__index" aria-hidden="true">01</span>
+          <h3 class="flagship__name">Premium Website<br/>Design</h3>
+          <p class="flagship__desc">Flagship digital experiences — composed like cinema, engineered like instruments. For brands that refuse to look mortal.</p>
+          <span class="flagship__glow" aria-hidden="true"></span>
+          <span class="flagship__hairline" aria-hidden="true"></span>
+        </article>
+        <article class="flagship" data-tilt>
+          <span class="flagship__index" aria-hidden="true">02</span>
+          <h3 class="flagship__name">Custom Web<br/>Applications</h3>
+          <p class="flagship__desc">Living systems with real logic beneath the surface — dashboards, platforms and tools that feel as considered as they are capable.</p>
+          <span class="flagship__glow" aria-hidden="true"></span>
+          <span class="flagship__hairline" aria-hidden="true"></span>
+        </article>
+        <article class="flagship" data-tilt>
+          <span class="flagship__index" aria-hidden="true">03</span>
+          <h3 class="flagship__name">UI / UX<br/>Design</h3>
+          <p class="flagship__desc">Interfaces that feel inevitable. Research, structure and motion resolved into journeys the hand already knows.</p>
+          <span class="flagship__glow" aria-hidden="true"></span>
+          <span class="flagship__hairline" aria-hidden="true"></span>
+        </article>
+      </div>
+
+      <!-- Catalog index -->
+      <ul class="catalog" id="catalog">
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">04</span>
+            <span class="catalog__name">Landing Pages</span>
+            <span class="catalog__hint"><em>One message, delivered at terminal velocity</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>A single screen with a single job. We choreograph copy, motion and proof into a descent that ends exactly where you want it to — on the button.</p>
+          </div>
+        </li>
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">05</span>
+            <span class="catalog__name">Business Websites</span>
+            <span class="catalog__hint"><em>Presence that compounds</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>The digital headquarters of your company — structured for clarity, styled for authority, and built to outlast trends.</p>
+          </div>
+        </li>
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">06</span>
+            <span class="catalog__name">Medical &amp; Dental Websites</span>
+            <span class="catalog__hint"><em>Precision you can feel before the first visit</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>Calm, credible and immaculate — patient journeys, booking flows and trust signals designed with clinical care.</p>
+          </div>
+        </li>
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">07</span>
+            <span class="catalog__name">Restaurant &amp; Café Websites</span>
+            <span class="catalog__hint"><em>Appetite, rendered</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>Menus, moods and reservations wrapped in imagery you can almost taste. The table is set before they arrive.</p>
+          </div>
+        </li>
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">08</span>
+            <span class="catalog__name">Real Estate Websites</span>
+            <span class="catalog__hint"><em>Architecture deserves architecture</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>Listings, developments and portfolios presented with the gravity of the spaces themselves — search, maps and galleries included.</p>
+          </div>
+        </li>
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">09</span>
+            <span class="catalog__name">Hospitality Websites</span>
+            <span class="catalog__hint"><em>The stay begins on screen</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>Hotels, resorts and retreats — atmosphere-first design with seamless booking, built to convert wanderlust into reservations.</p>
+          </div>
+        </li>
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">10</span>
+            <span class="catalog__name">Luxury Brand Websites</span>
+            <span class="catalog__hint"><em>Scarcity, staged in pixels</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>For maisons and makers of rare things: restrained typography, cinematic pacing and detail worthy of the product.</p>
+          </div>
+        </li>
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">11</span>
+            <span class="catalog__name">Corporate Websites</span>
+            <span class="catalog__hint"><em>Scale without noise</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>Multi-page ecosystems for serious organisations — governance, careers, investor and press surfaces unified under one calm system.</p>
+          </div>
+        </li>
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">12</span>
+            <span class="catalog__name">Portfolio Websites</span>
+            <span class="catalog__hint"><em>Your work, given a stage</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>For artists, architects and studios — galleries that get out of the way and interactions that make each piece an event.</p>
+          </div>
+        </li>
+        <li class="catalog__row">
+          <button class="catalog__head" type="button" aria-expanded="false">
+            <span class="catalog__index">13</span>
+            <span class="catalog__name">Premium CV &amp; Resume Design</span>
+            <span class="catalog__hint"><em>A career, typeset like a monograph</em></span>
+            <span class="catalog__plus" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="catalog__panel" role="region">
+            <p>Personal documents engineered to be remembered — typographic systems, hierarchy and restraint that make a first impression twice.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ================= 004 / MIND ================= -->
+    <section class="mind section" id="mind" data-section-label="004 — MIND">
+      <header class="section-head">
+        <span class="section-head__index">004</span>
+        <span class="section-head__rule"></span>
+        <h2 class="section-head__title">Mind</h2>
+      </header>
+      <div class="mind__grid">
+        <div class="mind__stage">
+          <canvas id="gl-mind" class="mind__canvas" aria-hidden="true"></canvas>
+          <span class="mind__caption" aria-hidden="true">FIG. 04 — THE VISITOR</span>
+        </div>
+        <div class="mind__copy">
+          <p class="mind__lede"><em>We design for the human behind the screen.</em></p>
+          <p>Every scroll is a heartbeat. Every hover, a question. Interfaces are conversations with a mind we will never meet — so we study attention, rhythm and doubt until the interface answers before the question is asked.</p>
+          <ul class="mind__tenets">
+            <li><span>Motion is meaning</span> — nothing moves without a reason.</li>
+            <li><span>Silence is structure</span> — empty space is load-bearing.</li>
+            <li><span>Depth is honesty</span> — hierarchy you can feel, not decode.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 005 / RITUAL (PROCESS) ================= -->
+    <section class="ritual section" id="ritual" data-section-label="005 — RITUAL">
+      <header class="section-head">
+        <span class="section-head__index">005</span>
+        <span class="section-head__rule"></span>
+        <h2 class="section-head__title">Ritual</h2>
+        <p class="section-head__note"><em>Four movements, one descent.</em></p>
+      </header>
+      <ol class="ritual__steps">
+        <li class="ritual__step">
+          <span class="ritual__num" aria-hidden="true">I</span>
+          <h3 class="ritual__name">Descend</h3>
+          <p class="ritual__desc">We go under the brief — into the brand, the audience, the unspoken goal. Nothing is designed until everything is understood.</p>
+        </li>
+        <li class="ritual__step">
+          <span class="ritual__num" aria-hidden="true">II</span>
+          <h3 class="ritual__name">Shape</h3>
+          <p class="ritual__desc">Structure before surface. Wireframes, systems and story-boards — the skeleton of the dimension you will inhabit.</p>
+        </li>
+        <li class="ritual__step">
+          <span class="ritual__num" aria-hidden="true">III</span>
+          <h3 class="ritual__name">Illuminate</h3>
+          <p class="ritual__desc">Light enters: typography, texture, motion and code. The design is built at full fidelity — nothing is faked.</p>
+        </li>
+        <li class="ritual__step">
+          <span class="ritual__num" aria-hidden="true">IV</span>
+          <h3 class="ritual__name">Transcend</h3>
+          <p class="ritual__desc">Testing, tuning, launch — then measurement and refinement. A HEBRA site is delivered sharp and kept sharp.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ================= 006 / TRANSMISSION (CONTACT) ================= -->
+    <section class="transmission section" id="transmission" data-section-label="006 — TRANSMISSION">
+      <header class="section-head">
+        <span class="section-head__index">006</span>
+        <span class="section-head__rule"></span>
+        <h2 class="section-head__title">Transmission</h2>
+      </header>
+      <div class="transmission__body">
+        <p class="transmission__lede"><em>The darkness is listening.</em></p>
+        <a class="transmission__cta" id="transmission-cta" href="mailto:studio@hebra.dev">
+          <span class="transmission__cta-ring" aria-hidden="true"></span>
+          <span class="transmission__cta-text">Begin<br/>Transmission</span>
+        </a>
+        <p class="transmission__mail">
+          <a href="mailto:studio@hebra.dev">studio@hebra.dev</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+    <div class="footer__row">
+      <span class="footer__mark" aria-hidden="true">H&thinsp;E&thinsp;B&thinsp;R&thinsp;A</span>
+      <p class="footer__phrase"><em>Designed to feel like another dimension.</em></p>
+      <ul class="footer__links">
+        <li><a href="https://www.instagram.com" rel="noopener noreferrer" target="_blank">Instagram</a></li>
+        <li><a href="https://www.behance.net" rel="noopener noreferrer" target="_blank">Behance</a></li>
+        <li><a href="https://www.linkedin.com" rel="noopener noreferrer" target="_blank">LinkedIn</a></li>
+      </ul>
+    </div>
+    <div class="footer__base">
+      <span>© 2026 HEBRA</span>
+      <span aria-hidden="true">0&thinsp;0&thinsp;0 → ∞</span>
+      <a href="#origin" class="footer__top">Return to darkness ↑</a>
+    </div>
+  </footer>
+
+  <!-- ================= OVERLAYS ================= -->
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor" id="cursor" aria-hidden="true">
+    <span class="cursor__dot"></span>
+    <span class="cursor__ring"></span>
+  </div>
+
+  <script src="assets/js/vendor/gsap.min.js"></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js"></script>
+  <script src="assets/js/vendor/lenis.min.js"></script>
+  <script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
