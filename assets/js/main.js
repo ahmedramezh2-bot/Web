@@ -5,6 +5,7 @@
 
 import { VoidScene } from './scene-void.js';
 import { MindScene } from './scene-mind.js';
+import { EyeScene } from './scene-eye.js';
 
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
@@ -336,10 +337,39 @@ reveal($$('.flagship'), { trigger: '.craft__flagships', stagger: 0.14 });
 reveal($$('.catalog__row'), { y: 26, duration: 0.9 });
 reveal(['.mind__stage'], { y: 50 });
 reveal(['.mind__copy'], { y: 50 });
+reveal(['.witness__slit'], { y: 60, duration: 1.6 });
+reveal(['.witness__copy'], { y: 40 });
+reveal($$('.works__row'), { y: 30, duration: 1 });
+reveal(['.works__note'], { y: 20 });
 reveal($$('.ritual__step'), { trigger: '.ritual__steps', stagger: 0.12 });
+reveal($$('.tier'), { trigger: '.threshold__tiers', stagger: 0.15 });
+reveal(['.threshold__note'], { y: 24 });
+reveal(['.gateway__emblem', '.gateway__line', '.gateway__hint'], {
+  trigger: '.gateway', stagger: 0.22, y: 30, duration: 1.6,
+});
 reveal(['.transmission__lede', '.transmission__cta', '.transmission__mail'], {
   trigger: '.transmission__body', stagger: 0.16, y: 36,
 });
+
+/* ------------------------------------------------------------
+   The Question — the answer arrives like a verdict
+   ------------------------------------------------------------ */
+if (!prefersReducedMotion && $('.question__answer')) {
+  reveal(['.question__pre', '.question__ask'], { trigger: '.question__stage', stagger: 0.2, y: 30 });
+  gsap.fromTo('.question__answer',
+    { scale: 2.4, opacity: 0, filter: 'blur(28px)' },
+    {
+      scale: 1, opacity: 1, filter: 'blur(0px)',
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.question__answer',
+        start: 'top 95%',
+        end: 'top 40%',
+        scrub: 0.5,
+      },
+    });
+  reveal($$('.question__because p'), { trigger: '.question__because', stagger: 0.18, y: 26 });
+}
 
 /* ------------------------------------------------------------
    Catalog — the index of disciplines
@@ -443,6 +473,77 @@ if (mindCanvas && !prefersReducedMotion) {
 }
 
 /* ------------------------------------------------------------
+   The Witness — the eye that watches back
+   ------------------------------------------------------------ */
+const eyeCanvas = $('#gl-eye');
+let eyeScene = null;
+let eyeVisible = false;
+if (eyeCanvas && !prefersReducedMotion) {
+  try {
+    eyeScene = new EyeScene(eyeCanvas, { lowPower });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!eyeScene) return;
+        eyeVisible = entry.isIntersecting;
+        eyeVisible ? eyeScene.start() : eyeScene.stop();
+      });
+    }, { rootMargin: '120px' });
+    io.observe(eyeCanvas);
+
+    // the eye tracks the hand anywhere on the page while it is awake
+    window.addEventListener('pointermove', (e) => {
+      if (!eyeVisible) return;
+      const r = eyeCanvas.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      eyeScene.setPointer(
+        (e.clientX - cx) / (r.width * 0.75),
+        -(e.clientY - cy) / (r.height * 0.9)
+      );
+    }, { passive: true });
+  } catch (err) {
+    console.warn('HEBRA: the witness sleeps.', err);
+  }
+}
+
+/* ------------------------------------------------------------
+   Works — constructions open to the hand as well as the cursor
+   ------------------------------------------------------------ */
+$$('.works__row').forEach((row) => {
+  row.addEventListener('click', () => row.classList.toggle('is-open'));
+  row.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      row.classList.toggle('is-open');
+    }
+  });
+});
+
+/* ------------------------------------------------------------
+   Touch — the surface acknowledges the hand
+   ------------------------------------------------------------ */
+if (!finePointer && !prefersReducedMotion) {
+  window.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return;
+    const r = document.createElement('span');
+    r.className = 'ripple';
+    r.style.left = `${e.clientX}px`;
+    r.style.top = `${e.clientY}px`;
+    document.body.appendChild(r);
+    setTimeout(() => r.remove(), 950);
+  }, { passive: true });
+
+  // gyroscope parallax where the platform grants it without ceremony
+  window.addEventListener('deviceorientation', (e) => {
+    if (e.gamma == null || e.beta == null || !voidScene) return;
+    voidScene.setMouse(
+      Math.max(-1, Math.min(1, e.gamma / 32)),
+      Math.max(-1, Math.min(1, (e.beta - 42) / 36))
+    );
+  }, { passive: true });
+}
+
+/* ------------------------------------------------------------
    Cursor — a quiet companion (fine pointers only)
    ------------------------------------------------------------ */
 if (finePointer && !prefersReducedMotion) {
@@ -489,10 +590,12 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     voidScene?.stop();
     mindScene?.stop();
+    eyeScene?.stop();
     loopVideos.forEach((v) => v.pause());
   } else {
     voidScene?.start();
     if (mindVisible) mindScene?.start();
+    if (eyeVisible) eyeScene?.start();
     loopVideos.forEach((v) => { if (v.dataset.inview) v.play().catch(() => {}); });
     ScrollTrigger.refresh();
   }
@@ -504,6 +607,7 @@ window.addEventListener('resize', () => {
   resizeTimer = setTimeout(() => {
     voidScene?.resize();
     mindScene?.resize();
+    eyeScene?.resize();
     ScrollTrigger.refresh();
   }, 150);
 });
