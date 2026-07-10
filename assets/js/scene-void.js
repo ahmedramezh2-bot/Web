@@ -57,9 +57,11 @@ const NOISE_GLSL = /* glsl */`
 `;
 
 export class VoidScene {
-  constructor(canvas, { lowPower = false } = {}) {
+  constructor(canvas, { lowPower = false, still = false } = {}) {
     this.canvas = canvas;
     this.lowPower = lowPower;
+    this.still = still; // reduced-motion: render one calm frame, no video
+
     this.mouse = new THREE.Vector2(0, 0);      // smoothed, -1..1
     this.mouseTarget = new THREE.Vector2(0, 0);
     this.scrollY = 0;
@@ -166,10 +168,34 @@ export class VoidScene {
 
     const geo = new THREE.OctahedronGeometry(2.1, 0);
 
+    // The studio's crystal-head footage lives inside the glass. The texture is
+    // sampled in object space so it turns with the crystal, like something
+    // sealed within it. Until the video actually plays, uVideoMix stays 0 and
+    // the material renders exactly as before.
+    let videoTex = null;
+    if (!this.still && typeof document !== 'undefined') {
+      const video = document.createElement('video');
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      video.preload = 'auto';
+      video.src = video.canPlayType('video/mp4; codecs="avc1.42E01E"')
+        ? 'assets/media/crystal-head.mp4'
+        : 'assets/media/crystal-head.webm';
+      videoTex = new THREE.VideoTexture(video);
+      videoTex.colorSpace = THREE.SRGBColorSpace;
+      this.crystalVideo = video;
+      video.addEventListener('playing', () => { this._videoLive = true; }, { once: true });
+      video.play().catch(() => { /* autoplay refused: shader keeps its procedural veil */ });
+    }
+
     this.crystalUniforms = {
       uTime: { value: 0 },
       uIgnite: { value: 0 },
       uReveal: { value: 0 },
+      uVideoMix: { value: 0 },
+      uVideo: { value: videoTex },
     };
 
     const faceMat = new THREE.ShaderMaterial({
@@ -195,6 +221,8 @@ export class VoidScene {
         uniform float uTime;
         uniform float uIgnite;
         uniform float uReveal;
+        uniform float uVideoMix;
+        uniform sampler2D uVideo;
         varying vec3 vNormal;
         varying vec3 vView;
         varying vec3 vPos;
@@ -208,6 +236,14 @@ export class VoidScene {
           vec3 col = mix(cold, pale, fresnel) * (0.16 + veil * 0.22);
           col += pale * uIgnite * 0.9;
           float a = (fresnel * 0.55 + veil * 0.10 + uIgnite * 0.5) * uReveal;
+          // the sealed footage: object-space projection, so it rotates with the glass
+          if (uVideoMix > 0.001) {
+            vec2 vuv = clamp(vPos.xy / 4.4 + 0.5, 0.0, 1.0);
+            vec3 vid = texture2D(uVideo, vuv).rgb;
+            float lum = dot(vid, vec3(0.299, 0.587, 0.114));
+            col += vid * uVideoMix * (0.5 + veil * 0.35);
+            a += lum * uVideoMix * 0.55 * uReveal;
+          }
           gl_FragColor = vec4(col, a);
         }
       `,
@@ -328,6 +364,9 @@ export class VoidScene {
     if (this.running) return;
     this.running = true;
     this.clock.start();
+    if (this.crystalVideo && this.crystalVideo.paused) {
+      this.crystalVideo.play().catch(() => {});
+    }
     const loop = () => {
       if (!this.running) return;
       this._tick();
@@ -339,6 +378,7 @@ export class VoidScene {
   stop() {
     this.running = false;
     if (this.raf) cancelAnimationFrame(this.raf);
+    if (this.crystalVideo && !this.crystalVideo.paused) this.crystalVideo.pause();
   }
 
   renderOnce() { this._tick(); }
@@ -357,6 +397,9 @@ export class VoidScene {
     this.crystalUniforms.uTime.value = t;
     this.crystalUniforms.uIgnite.value = this.ignition.value;
     this.crystalUniforms.uReveal.value = Math.min(1, p * 1.4);
+    // the sealed footage fades in only once frames are actually flowing
+    const mixTarget = this._videoLive ? 1 : 0;
+    this.crystalUniforms.uVideoMix.value += (mixTarget - this.crystalUniforms.uVideoMix.value) * 0.02;
 
     this.starUniforms.uOpacity.value = (0.15 + p * 0.85) * (1 - fade * 0.55);
     this.dustUniforms.uOpacity.value = p * (1 - fade * 0.8);
