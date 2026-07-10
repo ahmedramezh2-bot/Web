@@ -12,7 +12,13 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 const lowPower = !finePointer || window.innerWidth < 768;
-const revisiting = sessionStorage.getItem('hebra-entered') === '1';
+
+// sessionStorage can throw (private modes, file://) — never let it take the site down
+const store = {
+  get(k) { try { return sessionStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { sessionStorage.setItem(k, v); } catch { /* darkness forgets */ } },
+};
+const revisiting = store.get('hebra-entered') === '1';
 
 const gsap = window.gsap;
 const ScrollTrigger = window.ScrollTrigger;
@@ -47,7 +53,7 @@ const scrollTo = (target) => {
 const stageCanvas = $('#gl-stage');
 let voidScene = null;
 try {
-  voidScene = new VoidScene(stageCanvas, { lowPower });
+  voidScene = new VoidScene(stageCanvas, { lowPower, still: prefersReducedMotion });
   if (!prefersReducedMotion) voidScene.start();
 } catch (err) {
   document.documentElement.classList.add('no-gl');
@@ -89,7 +95,7 @@ let riteFinished = false;
 function finishRite(instant = false) {
   if (riteFinished) return;
   riteFinished = true;
-  sessionStorage.setItem('hebra-entered', '1');
+  store.set('hebra-entered', '1');
 
   const done = () => {
     document.body.dataset.loading = 'false';
@@ -279,9 +285,13 @@ $$('.menu__link').forEach((link) => {
 $$('a[href^="#"]:not(.menu__link)').forEach((link) => {
   link.addEventListener('click', (e) => {
     const target = link.getAttribute('href');
-    if (target.length > 1 && $(target)) {
+    const el = target.length > 1 && $(target);
+    if (el) {
       e.preventDefault();
       scrollTo(target);
+      // keep keyboard users' focus in step with the scroll (skip link etc.)
+      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+      el.focus({ preventScroll: true });
     }
   });
 });
@@ -370,6 +380,35 @@ if (finePointer && !prefersReducedMotion) {
 }
 
 /* ------------------------------------------------------------
+   Animated loops — play only while watched, drift with the page
+   ------------------------------------------------------------ */
+const loopVideos = $$('video[data-loop]');
+if (loopVideos.length && !prefersReducedMotion) {
+  const vio = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const v = entry.target;
+      v.dataset.inview = entry.isIntersecting ? '1' : '';
+      if (entry.isIntersecting && !document.hidden) v.play().catch(() => {});
+      else v.pause();
+    });
+  }, { rootMargin: '120px' });
+  loopVideos.forEach((v) => vio.observe(v));
+}
+
+// the figure of dust sinks slowly as the manifesto is read
+const manifestoFigure = $('.manifesto__figure');
+if (manifestoFigure && !prefersReducedMotion) {
+  const restOpacity = parseFloat(getComputedStyle(manifestoFigure).opacity) || 0.55;
+  gsap.fromTo(manifestoFigure,
+    { yPercent: 8, opacity: 0 },
+    {
+      yPercent: -10, opacity: restOpacity,
+      ease: 'none',
+      scrollTrigger: { trigger: '#manifesto', start: 'top 85%', end: 'bottom 20%', scrub: 0.6 },
+    });
+}
+
+/* ------------------------------------------------------------
    The Mind — contour presence, awake only when watched
    ------------------------------------------------------------ */
 const mindCanvas = $('#gl-mind');
@@ -387,12 +426,16 @@ if (mindCanvas && !prefersReducedMotion) {
     }, { rootMargin: '80px' });
     io.observe(mindCanvas);
 
+    const mindVideo = $('#mind-video');
     $('#mind').addEventListener('pointermove', (e) => {
       const r = mindCanvas.getBoundingClientRect();
-      mindScene.setMouse(
-        ((e.clientX - r.left) / r.width) * 2 - 1,
-        ((e.clientY - r.top) / r.height) * 2 - 1
-      );
+      const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
+      mindScene.setMouse(nx, ny);
+      // the footage beneath leans with the same hand, a touch behind the form
+      if (mindVideo && finePointer) {
+        mindVideo.style.transform = `perspective(700px) rotateY(${nx * 4}deg) rotateX(${-ny * 3}deg) scale(1.04)`;
+      }
     }, { passive: true });
   } catch (err) {
     console.warn('HEBRA: the mind rests.', err);
@@ -446,9 +489,11 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     voidScene?.stop();
     mindScene?.stop();
+    loopVideos.forEach((v) => v.pause());
   } else {
     voidScene?.start();
     if (mindVisible) mindScene?.start();
+    loopVideos.forEach((v) => { if (v.dataset.inview) v.play().catch(() => {}); });
     ScrollTrigger.refresh();
   }
 });

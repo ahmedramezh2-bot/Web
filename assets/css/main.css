@@ -478,7 +478,24 @@ main { position: relative; z-index: 1; }
 }
 .manifesto.is-inview .manifesto__rays { opacity: 1; }
 
-.manifesto__body { max-width: 46rem; }
+/* The figure of dust — the attached particle-human loop, dissolved into the void */
+.manifesto__figure {
+  position: absolute;
+  right: -4%; top: 4%;
+  width: min(44rem, 58vw);
+  aspect-ratio: 1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  -webkit-mask-image: radial-gradient(62% 62% at 50% 46%, #000 30%, transparent 74%);
+  mask-image: radial-gradient(62% 62% at 50% 46%, #000 30%, transparent 74%);
+}
+.manifesto__figure video { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 60em) {
+  .manifesto__figure { right: -24%; top: 0; width: 34rem; opacity: 0.35; }
+}
+
+.manifesto__body { max-width: 46rem; position: relative; }
 .manifesto__line {
   font-size: clamp(1.7rem, 1.1rem + 3.4vw, 3.4rem);
   line-height: 1.28;
@@ -644,7 +661,19 @@ main { position: relative; z-index: 1; }
   margin-inline: auto;
   border: 1px solid var(--hairline);
 }
-.mind__canvas { width: 100%; height: 100%; }
+/* The attached contour-head loop lives beneath the interactive form —
+   the two scan-line layers read as one hologram */
+.mind__video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  mix-blend-mode: screen;
+  opacity: 0.6;
+  -webkit-mask-image: radial-gradient(72% 72% at 50% 50%, #000 38%, transparent 80%);
+  mask-image: radial-gradient(72% 72% at 50% 50%, #000 38%, transparent 80%);
+  will-change: transform;
+}
+.mind__canvas { position: relative; z-index: 1; width: 100%; height: 100%; }
 .mind__caption {
   position: absolute; left: 1rem; bottom: 0.8rem;
   font-family: var(--font-display); font-size: 0.6rem;
@@ -873,6 +902,7 @@ main { position: relative; z-index: 1; }
   html { scroll-behavior: auto; }
   .grain { animation: none; }
   .js [data-reveal] { opacity: 1; transform: none; }
+  .manifesto__figure, .mind__video { display: none; }
   .preloader { display: none; }
   body[data-loading="true"] { overflow: auto; }
   .gl-stage { opacity: 1; }
