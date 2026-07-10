@@ -89,14 +89,129 @@ export class VoidScene {
     this.scene = new THREE.Scene();
     this.scene.fog = new THREE.FogExp2(0x050507, 0.035);
 
-    this.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
+    this.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 160);
     this.camera.position.set(0, 0, 15);
 
+    this._buildNebula();
     this._buildStars();
+    this._buildDistantLight();
     this._buildCrystal();
     this._buildDust();
 
     this.resize();
+  }
+
+  /* ---------- Nebula: the universe breathing far behind everything ---------- */
+  _buildNebula() {
+    this.nebulaUniforms = {
+      uTime: { value: 0 },
+      uOpacity: { value: 0 },
+    };
+    const mat = new THREE.ShaderMaterial({
+      uniforms: this.nebulaUniforms,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexShader: /* glsl */`
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: /* glsl */`
+        ${NOISE_GLSL}
+        uniform float uTime;
+        uniform float uOpacity;
+        varying vec2 vUv;
+        float fbm(vec3 p) {
+          float s = 0.0, a = 0.5;
+          for (int i = 0; i < 4; i++) { s += a * snoise(p); p *= 2.03; a *= 0.5; }
+          return s;
+        }
+        void main() {
+          vec2 uv = vUv - 0.5;
+          float t = uTime * 0.008;
+          float n1 = fbm(vec3(uv * 2.2, t));
+          float n2 = fbm(vec3(uv * 3.4 + 7.31, t * 1.4 + 3.0));
+          float cloud1 = smoothstep(-0.1, 0.85, n1);
+          float cloud2 = smoothstep(0.15, 0.95, n2);
+          // deep indigo body, violet drift, a cold cyan whisper
+          vec3 col = vec3(0.05, 0.06, 0.16) * cloud1
+                   + vec3(0.09, 0.05, 0.18) * cloud2 * 0.8
+                   + vec3(0.03, 0.08, 0.14) * cloud1 * cloud2;
+          float falloff = smoothstep(0.72, 0.15, length(uv * vec2(1.0, 1.35)));
+          float a = (cloud1 * 0.5 + cloud2 * 0.3) * falloff * uOpacity;
+          gl_FragColor = vec4(col, a);
+        }
+      `,
+    });
+    this.nebula = new THREE.Mesh(new THREE.PlaneGeometry(220, 140), mat);
+    this.nebula.position.set(0, 4, -70);
+    this.scene.add(this.nebula);
+  }
+
+  /* ---------- The Distant Light: reality opening, far away ---------- */
+  _buildDistantLight() {
+    this.lightUniforms = {
+      uTime: { value: 0 },
+      uPhase: { value: 0 },   // rite progress, eased
+      uAfter: { value: 1 },   // dims to a faint aura once the site is open
+    };
+    const mat = new THREE.ShaderMaterial({
+      uniforms: this.lightUniforms,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexShader: /* glsl */`
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: /* glsl */`
+        ${NOISE_GLSL}
+        uniform float uTime;
+        uniform float uPhase;
+        uniform float uAfter;
+        varying vec2 vUv;
+        void main() {
+          vec2 uv = (vUv - 0.5) * 2.0;
+          float d = length(uv);
+          float ph = clamp(uPhase, 0.0, 1.0);
+
+          // the core: a pinprick of another reality, slowly growing
+          float coreSize = mix(340.0, 26.0, ph * ph);
+          float core = exp(-d * d * coreSize);
+
+          // halo breathes outward as the light approaches
+          float halo = exp(-d * mix(14.0, 3.2, ph)) * (0.25 + ph * 0.75);
+
+          // volumetric rays — visible shafts, slowly turning, noise-broken
+          float ang = atan(uv.y, uv.x);
+          float rayN = snoise(vec3(ang * 3.0, uTime * 0.05, 4.7)) * 0.5
+                     + snoise(vec3(ang * 9.0, uTime * 0.03, 9.1)) * 0.3;
+          float rays = pow(abs(sin(ang * 6.0 + rayN * 2.4 + uTime * 0.02)), 18.0)
+                     * exp(-d * 2.2) * smoothstep(0.25, 0.85, ph) * 0.55;
+
+          // a faint lensing ring — space bending around the arrival
+          float ringR = 0.32 + ph * 0.30 + rayN * 0.012;
+          float ring = smoothstep(0.018, 0.0, abs(d - ringR)) * 0.10 * smoothstep(0.45, 0.95, ph);
+
+          // warm heart, cold edge — the colour of a door opening
+          vec3 warm = vec3(1.0, 0.97, 0.90);
+          vec3 cold = vec3(0.55, 0.65, 1.0);
+          vec3 col = warm * core * 1.6 + cold * halo * 0.7 + warm * rays + cold * ring;
+
+          float a = (core * 1.2 + halo * 0.55 + rays + ring) * uAfter;
+          gl_FragColor = vec4(col * uAfter, a);
+        }
+      `,
+    });
+    this.distantLight = new THREE.Mesh(new THREE.PlaneGeometry(46, 46), mat);
+    this.distantLight.position.set(0, 0, -26);
+    this.scene.add(this.distantLight);
   }
 
   /* ---------- Starfield: three depth shells, shader-twinkled ---------- */
@@ -227,15 +342,24 @@ export class VoidScene {
         varying vec3 vView;
         varying vec3 vPos;
         void main() {
-          float fresnel = pow(1.0 - abs(dot(vNormal, vView)), 2.4);
+          float facing = 1.0 - abs(dot(vNormal, vView));
+          float fresnel = pow(facing, 2.4);
+          // chromatic dispersion at the rim — light splitting inside real glass
+          vec3 disp = vec3(pow(facing, 2.0), pow(facing, 2.5), pow(facing, 3.1));
           // slow internal aurora — the cosmos trapped in the glass
           float veil = snoise(vPos * 0.55 + vec3(0.0, uTime * 0.06, uTime * 0.045));
           veil = smoothstep(-0.35, 0.9, veil);
           vec3 cold = vec3(0.55, 0.62, 0.95);
           vec3 pale = vec3(0.92, 0.93, 0.97);
           vec3 col = mix(cold, pale, fresnel) * (0.16 + veil * 0.22);
+          col += disp * vec3(0.10, 0.07, 0.16);
+          // a travelling facet glint — a light source drifting in orbit
+          vec3 lightDir = normalize(vec3(cos(uTime * 0.13), 0.55, sin(uTime * 0.13)));
+          vec3 refl = reflect(-vView, vNormal);
+          float glint = pow(max(dot(refl, lightDir), 0.0), 90.0);
+          col += pale * glint * 1.4;
           col += pale * uIgnite * 0.9;
-          float a = (fresnel * 0.55 + veil * 0.10 + uIgnite * 0.5) * uReveal;
+          float a = (fresnel * 0.55 + veil * 0.10 + glint * 0.6 + uIgnite * 0.5) * uReveal;
           // the sealed footage: object-space projection, so it rotates with the glass
           if (uVideoMix > 0.001) {
             vec2 vuv = clamp(vPos.xy / 4.4 + 0.5, 0.0, 1.0);
@@ -261,6 +385,19 @@ export class VoidScene {
     });
     this.crystalEdges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), edgeMat);
     this.crystal.add(this.crystalEdges);
+
+    // inner core — a smaller lattice turning against the glass, giving depth
+    this.crystalCore = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.OctahedronGeometry(1.02, 0)),
+      new THREE.LineBasicMaterial({
+        color: 0x8fa2e8,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      })
+    );
+    this.crystal.add(this.crystalCore);
 
     // inner cosmos — a handful of drifting sparks inside the glass
     const n = this.lowPower ? 40 : 90;
@@ -308,6 +445,7 @@ export class VoidScene {
       uTime: { value: 0 },
       uOpacity: { value: 0 },
       uPixelRatio: { value: 1 },
+      uGather: { value: 0 },
     };
     const mat = new THREE.ShaderMaterial({
       uniforms: this.dustUniforms,
@@ -318,11 +456,14 @@ export class VoidScene {
         attribute float aSeed;
         uniform float uTime;
         uniform float uPixelRatio;
+        uniform float uGather;
         varying float vFade;
         void main() {
           vec3 p = position;
           p.y += sin(uTime * 0.12 + aSeed) * 0.8;
           p.x += cos(uTime * 0.09 + aSeed * 2.0) * 0.5;
+          // during the rite the dust wakes and drifts toward the light
+          p = mix(p, p * 0.3, uGather * (0.4 + 0.6 * fract(aSeed * 0.73)));
           vec4 mv = modelViewMatrix * vec4(p, 1.0);
           gl_Position = projectionMatrix * mv;
           vFade = 0.4 + 0.6 * sin(aSeed);
@@ -403,8 +544,27 @@ export class VoidScene {
 
     this.starUniforms.uOpacity.value = (0.15 + p * 0.85) * (1 - fade * 0.55);
     this.dustUniforms.uOpacity.value = p * (1 - fade * 0.8);
+    this.dustUniforms.uGather.value = this._smooth(0.5, 0.95, p) * (1 - shift);
     this.crystalEdges.material.opacity = (0.12 + p * 0.5 + this.ignition.value * 0.5) * (1 - fade);
+    this.crystalCore.material.opacity = (p * 0.3 + this.ignition.value * 0.4) * (1 - fade);
+    this.crystalCore.rotation.y = -t * 0.31;
+    this.crystalCore.rotation.z = t * 0.11;
     this.sparkMat.opacity = (p * 0.85 + this.ignition.value) * (1 - fade);
+
+    // the universe behind everything
+    this.nebulaUniforms.uTime.value = t;
+    this.nebulaUniforms.uOpacity.value = (0.25 + p * 0.75) * (1 - fade * 0.35);
+    this.nebula.position.x = this.mouse.x * -1.6;
+    this.nebula.position.y = 4 + this.mouse.y * 1.0 + this.scrollY * -0.002;
+
+    // the distant light: a pinprick for most of the rite — it only blooms
+    // when the ignition fires, so the arrival stays patient and far away
+    this.lightUniforms.uTime.value = t;
+    this.lightUniforms.uPhase.value = Math.pow(p, 2.6) * 0.62 + this.ignition.value * 0.55;
+    const auraTarget = (1 - shift * 0.86) * (1 - fade);
+    this.lightUniforms.uAfter.value += (auraTarget - this.lightUniforms.uAfter.value) * 0.03;
+    this.distantLight.position.x = this.mouse.x * -0.8;
+    this.distantLight.position.y = this.mouse.y * 0.6;
 
     // crystal life — the rite grows it centre-stage, the hero framing
     // sends it drifting off to orbit (far right on landscape, high and
@@ -431,6 +591,11 @@ export class VoidScene {
     this.stars.rotation.x = this.mouse.y * 0.015 + this.scrollY * 0.00004;
 
     this.renderer.render(this.scene, this.camera);
+  }
+
+  _smooth(a, b, x) {
+    const s = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return s * s * (3 - 2 * s);
   }
 
   dispose() {

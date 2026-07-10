@@ -270,20 +270,34 @@ body:not([data-loading="true"]) .header { opacity: 1; transform: none; pointer-e
   max-width: 72rem; margin: 0 auto;
 }
 
+.menu__list {
+  display: grid;
+  gap: 0 clamp(2rem, 6vw, 5rem);
+  max-height: 70svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (min-width: 60em) { .menu__list { grid-template-columns: 1fr 1fr; } }
+
 .menu__item { overflow: hidden; }
 .menu__link {
-  display: flex; align-items: baseline; gap: clamp(1rem, 3vw, 2.5rem);
-  padding: clamp(0.4rem, 1.2vh, 0.9rem) 0;
+  display: flex; align-items: baseline; gap: clamp(0.9rem, 2.5vw, 2rem);
+  padding: clamp(0.3rem, 1vh, 0.7rem) 0;
   transform: translateY(110%);
   transition: transform 0.9s var(--ease-out);
 }
 .menu.is-open .menu__link { transform: translateY(0); }
-.menu.is-open .menu__item:nth-child(1) .menu__link { transition-delay: 0.10s; }
-.menu.is-open .menu__item:nth-child(2) .menu__link { transition-delay: 0.16s; }
-.menu.is-open .menu__item:nth-child(3) .menu__link { transition-delay: 0.22s; }
-.menu.is-open .menu__item:nth-child(4) .menu__link { transition-delay: 0.28s; }
-.menu.is-open .menu__item:nth-child(5) .menu__link { transition-delay: 0.34s; }
-.menu.is-open .menu__item:nth-child(6) .menu__link { transition-delay: 0.40s; }
+.menu.is-open .menu__item:nth-child(1) .menu__link { transition-delay: 0.08s; }
+.menu.is-open .menu__item:nth-child(2) .menu__link { transition-delay: 0.12s; }
+.menu.is-open .menu__item:nth-child(3) .menu__link { transition-delay: 0.16s; }
+.menu.is-open .menu__item:nth-child(4) .menu__link { transition-delay: 0.20s; }
+.menu.is-open .menu__item:nth-child(5) .menu__link { transition-delay: 0.24s; }
+.menu.is-open .menu__item:nth-child(6) .menu__link { transition-delay: 0.28s; }
+.menu.is-open .menu__item:nth-child(7) .menu__link { transition-delay: 0.32s; }
+.menu.is-open .menu__item:nth-child(8) .menu__link { transition-delay: 0.36s; }
+.menu.is-open .menu__item:nth-child(9) .menu__link { transition-delay: 0.40s; }
+.menu.is-open .menu__item:nth-child(10) .menu__link { transition-delay: 0.44s; }
+.menu.is-open .menu__item:nth-child(11) .menu__link { transition-delay: 0.48s; }
 
 .menu__index {
   font-family: var(--font-display); font-size: 0.7rem;
@@ -292,9 +306,10 @@ body:not([data-loading="true"]) .header { opacity: 1; transform: none; pointer-e
 }
 .menu__word {
   font-family: var(--font-display); font-weight: 300;
-  font-size: clamp(2.2rem, 1rem + 6.5vw, 5.2rem);
-  line-height: 1.05; letter-spacing: 0.04em;
+  font-size: clamp(1.5rem, 0.8rem + 3.6vw, 3.2rem);
+  line-height: 1.1; letter-spacing: 0.04em;
   color: var(--ink-dim);
+  white-space: nowrap;
   transition: color 0.5s var(--ease-out), letter-spacing 0.5s var(--ease-out);
 }
 .menu__link:hover .menu__word,
@@ -699,7 +714,326 @@ main { position: relative; z-index: 1; }
 .mind__tenets span { color: var(--ink); font-weight: 400; }
 
 /* ============================================================
-   005 — RITUAL (PROCESS)
+   005 — WITNESS (THE EYE)
+   ============================================================ */
+.witness__slit {
+  position: relative;
+  width: min(100%, 64rem);
+  margin: 0 auto;
+  aspect-ratio: 2.35 / 1;           /* anamorphic — the mask's eye slit */
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 160% at 50% 50%, rgba(20, 22, 34, 0.55), rgba(5, 5, 7, 0.9));
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.85);
+}
+.witness__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.witness__caption {
+  position: absolute; left: 50%; bottom: 0.9rem; transform: translateX(-50%);
+  font-family: var(--font-display); font-size: 0.6rem;
+  letter-spacing: 0.35em; color: var(--ink-faint);
+}
+.witness__copy {
+  max-width: var(--measure);
+  margin: clamp(2.5rem, 6vh, 4rem) auto 0;
+  text-align: center;
+}
+.witness__lede {
+  font-size: clamp(1.4rem, 1rem + 2vw, 2.3rem);
+  line-height: 1.35; margin-bottom: 1.2rem;
+}
+.witness__copy > p:not(.witness__lede) { color: var(--ink-dim); }
+
+/* ============================================================
+   006 — WORKS (CONSTRUCTIONS)
+   ============================================================ */
+.works__list { border-top: 1px solid var(--hairline); }
+
+.works__row {
+  position: relative;
+  border-bottom: 1px solid var(--hairline);
+  padding: clamp(1.4rem, 3.2vh, 2.2rem) 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: padding 0.6s var(--ease-out);
+}
+.works__row:hover, .works__row:focus-visible { padding-left: 1rem; }
+
+.works__face {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: baseline;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  position: relative; z-index: 1;
+}
+.works__code {
+  font-family: var(--font-display); font-size: 0.65rem;
+  letter-spacing: 0.35em; color: var(--ink-faint);
+}
+.works__name {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: clamp(1.5rem, 1rem + 2.6vw, 2.8rem);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-dim);
+  transition: color 0.5s, letter-spacing 0.5s var(--ease-out);
+}
+.works__row:hover .works__name, .works__row:focus-visible .works__name {
+  color: var(--ink); letter-spacing: 0.1em;
+}
+.works__sector {
+  font-family: var(--font-serif); font-style: italic;
+  color: var(--ink-faint); font-size: 1.05rem;
+  display: none;
+}
+@media (min-width: 48em) { .works__sector { display: block; } }
+.works__status {
+  font-family: var(--font-display); font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--signal);
+  border: 1px solid var(--signal-dim);
+  padding: 0.45em 0.9em; border-radius: 999px;
+  align-self: center;
+}
+.works__status--sealed { color: var(--ink-faint); border-color: var(--hairline-strong); }
+.works__status--forming { color: var(--ink-dim); border-style: dashed; }
+
+.works__veil {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows 0.7s var(--ease-inout), opacity 0.7s;
+  opacity: 0;
+  position: relative; z-index: 1;
+}
+.works__veil > p {
+  overflow: hidden;
+  max-width: 40em; color: var(--ink-dim);
+}
+.works__row:hover .works__veil,
+.works__row:focus-visible .works__veil,
+.works__row.is-open .works__veil { grid-template-rows: 1fr; opacity: 1; }
+.works__row:hover .works__veil > p,
+.works__row:focus-visible .works__veil > p,
+.works__row.is-open .works__veil > p { padding-top: 1rem; }
+.works__row.is-open .works__name { color: var(--ink); }
+.works__redact {
+  display: block;
+  font-family: var(--font-display); font-size: 0.62rem;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 0.8em;
+}
+
+.works__ghost {
+  position: absolute; right: -0.05em; top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-serif); font-style: italic;
+  font-size: clamp(6rem, 14vw, 12rem);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(237, 237, 240, 0.05);
+  pointer-events: none;
+  transition: -webkit-text-stroke-color 0.7s, transform 0.9s var(--ease-out);
+}
+.works__row:hover .works__ghost {
+  -webkit-text-stroke-color: rgba(109, 140, 255, 0.16);
+  transform: translateY(-50%) translateX(-0.5rem);
+}
+.works__note { margin-top: 2rem; color: var(--ink-faint); text-align: right; }
+
+/* ============================================================
+   007 — THE QUESTION
+   ============================================================ */
+.question {
+  min-height: 100svh;
+  display: grid; place-items: center;
+  text-align: center;
+}
+.question__stage { max-width: 60rem; }
+.question__pre {
+  font-family: var(--font-display); font-size: 0.7rem;
+  letter-spacing: 0.45em; text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 1.6rem;
+}
+.question__ask {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: clamp(1.7rem, 1rem + 3.6vw, 3.6rem);
+  line-height: 1.3;
+  color: var(--ink-dim);
+  margin-bottom: clamp(2.5rem, 7vh, 4.5rem);
+}
+.question__answer {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: clamp(6rem, 22vw, 17rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 120px rgba(109, 140, 255, 0.35);
+}
+.question__dot { color: var(--signal); }
+.question__because {
+  max-width: 34em;
+  margin: clamp(2.5rem, 7vh, 4.5rem) auto 0;
+  display: grid; gap: 1em;
+  color: var(--ink-dim);
+}
+.question__because em { color: var(--ink); }
+
+/* ============================================================
+   008 — COVENANT (five phases)
+   ============================================================ */
+@media (min-width: 72em) {
+  .ritual__steps--five { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* ============================================================
+   009 — THRESHOLD (PRICING)
+   ============================================================ */
+.threshold__tiers {
+  display: grid; gap: 1.2rem;
+  align-items: stretch;
+}
+@media (min-width: 64em) {
+  .threshold__tiers { grid-template-columns: 1fr 1.18fr 1fr; align-items: center; }
+}
+
+.tier {
+  position: relative;
+  border: 1px solid var(--hairline);
+  background: linear-gradient(to bottom, rgba(12, 12, 18, 0.5), rgba(5, 5, 7, 0.2));
+  padding: clamp(1.8rem, 3vw, 2.6rem);
+  display: flex; flex-direction: column;
+  transition: border-color 0.6s, transform 0.7s var(--ease-out), box-shadow 0.7s;
+}
+.tier:hover { border-color: var(--hairline-strong); transform: translateY(-4px); }
+
+.tier--monument {
+  border-color: var(--signal-dim);
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(109, 140, 255, 0.08), transparent),
+    linear-gradient(to bottom, rgba(14, 16, 26, 0.75), rgba(5, 5, 7, 0.35));
+  box-shadow: 0 0 60px rgba(109, 140, 255, 0.06);
+}
+.tier--monument:hover {
+  border-color: var(--signal);
+  box-shadow: 0 0 90px rgba(109, 140, 255, 0.12);
+}
+@media (min-width: 64em) { .tier--monument { padding-block: clamp(2.6rem, 4vw, 3.6rem); } }
+
+.tier__label {
+  font-family: var(--font-display); font-size: 0.6rem;
+  letter-spacing: 0.4em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 1.6rem;
+}
+.tier__label--signal { color: var(--signal); }
+.tier__name {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+.tier__price {
+  font-family: var(--font-display); font-size: 1.15rem;
+  letter-spacing: 0.08em; color: var(--ink);
+  margin-bottom: 1rem;
+}
+.tier__price span {
+  font-family: var(--font-serif); font-style: italic;
+  color: var(--ink-faint); margin-right: 0.4em; letter-spacing: 0;
+}
+.tier__desc { color: var(--ink-dim); margin-bottom: 1.6rem; font-size: 0.95em; }
+.tier__list { display: grid; gap: 0.55rem; margin-bottom: 2rem; }
+.tier__list li {
+  color: var(--ink-dim); font-size: 0.9em;
+  padding-left: 1.4rem; position: relative;
+}
+.tier__list li::before {
+  content: "";
+  position: absolute; left: 0; top: 0.7em;
+  width: 0.6rem; height: 1px; background: var(--ink-faint);
+}
+.tier--monument .tier__list li::before { background: var(--signal); }
+
+.tier__cta {
+  margin-top: auto;
+  align-self: flex-start;
+  font-family: var(--font-display); font-size: 0.7rem;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--ink-dim);
+  border: 1px solid var(--hairline-strong);
+  padding: 0.95em 1.8em;
+  border-radius: 999px;
+  transition: color 0.5s, border-color 0.5s, background 0.5s, letter-spacing 0.5s var(--ease-out);
+}
+.tier__cta:hover { color: var(--ink); border-color: var(--ink); letter-spacing: 0.36em; }
+.tier__cta--solid {
+  color: var(--void); background: var(--ink); border-color: var(--ink);
+}
+.tier__cta--solid:hover {
+  color: var(--void); background: #fff;
+  box-shadow: 0 0 40px rgba(237, 237, 240, 0.25);
+}
+.threshold__note { margin-top: 2.5rem; text-align: center; color: var(--ink-faint); }
+
+/* ============================================================
+   010 — ARCHIVE (FAQ) — inherits the catalog mechanics
+   ============================================================ */
+.catalog--archive .catalog__name {
+  font-size: clamp(1.05rem, 0.85rem + 1.2vw, 1.5rem);
+}
+.catalog--archive .catalog__head { grid-template-columns: 3.5rem 1fr auto; }
+@media (max-width: 54em) { .catalog--archive .catalog__head { grid-template-columns: auto 1fr auto; } }
+.catalog--archive .catalog__panel > p { color: var(--ink-dim); }
+
+/* ============================================================
+   GATEWAY — the ending that is not an end
+   ============================================================ */
+.gateway {
+  position: relative;
+  min-height: 90svh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: var(--section-gap) var(--gutter);
+  gap: clamp(2rem, 6vh, 3.5rem);
+}
+.gateway__emblem {
+  width: clamp(9rem, 22vw, 14rem);
+  color: var(--ink);
+  opacity: 0.8;
+  animation: gateway-turn 90s linear infinite;
+}
+@keyframes gateway-turn { to { transform: rotate(360deg); } }
+.gateway__line {
+  font-size: clamp(1.3rem, 1rem + 1.8vw, 2.2rem);
+  line-height: 1.5;
+  color: var(--ink-dim);
+  max-width: 26em;
+}
+.gateway__line em { color: var(--ink); font-weight: 300; }
+.gateway__hint {
+  font-family: var(--font-display); font-size: 0.65rem;
+  letter-spacing: 0.45em; text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ============================================================
+   TOUCH RIPPLE — the surface acknowledges the hand
+   ============================================================ */
+.ripple {
+  position: fixed; z-index: 85;
+  width: 8px; height: 8px; margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 1px solid rgba(237, 237, 240, 0.5);
+  box-shadow: 0 0 20px rgba(109, 140, 255, 0.35);
+  animation: ripple-out 0.9s var(--ease-out) forwards;
+}
+@keyframes ripple-out {
+  to { transform: scale(14); opacity: 0; }
+}
+
+/* ============================================================
+   005 (legacy numbering) — RITUAL / COVENANT (PROCESS)
    ============================================================ */
 .ritual__steps {
   display: grid; gap: 1px;
@@ -795,6 +1129,7 @@ main { position: relative; z-index: 1; }
   transition: color 0.4s, border-color 0.4s;
 }
 .transmission__mail a:hover { color: var(--ink); border-color: var(--ink); }
+.transmission__sep { color: var(--ink-faint); margin: 0 1.2em; }
 
 /* ============================================================
    FOOTER
@@ -903,6 +1238,8 @@ main { position: relative; z-index: 1; }
   .grain { animation: none; }
   .js [data-reveal] { opacity: 1; transform: none; }
   .manifesto__figure, .mind__video { display: none; }
+  .gateway__emblem { animation: none; }
+  .ripple { display: none; }
   .preloader { display: none; }
   body[data-loading="true"] { overflow: auto; }
   .gl-stage { opacity: 1; }
