@@ -1,10 +1,10 @@
 name: Deploy to GitHub Pages
 
+# The experience deploys only from main. Working branches never
+# overwrite the live world.
 on:
   push:
-    branches:
-      - main
-      - claude/hebra-premium-refinement-wx6yzd
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -24,11 +24,15 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
+      - uses: actions/setup-node@v4
         with:
-          enablement: true
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
