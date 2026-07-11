@@ -551,9 +551,11 @@ export class VoidScene {
     this.crystalCore.rotation.z = t * 0.11;
     this.sparkMat.opacity = (p * 0.85 + this.ignition.value) * (1 - fade);
 
-    // the universe behind everything
+    // the universe behind everything — and it breathes, slowly enough
+    // that the visitor only notices after living with it a while
     this.nebulaUniforms.uTime.value = t;
-    this.nebulaUniforms.uOpacity.value = (0.25 + p * 0.75) * (1 - fade * 0.35);
+    this.nebulaUniforms.uOpacity.value =
+      (0.25 + p * 0.75) * (1 - fade * 0.35) * (0.86 + 0.14 * Math.sin(t * 0.047));
     this.nebula.position.x = this.mouse.x * -1.6;
     this.nebula.position.y = 4 + this.mouse.y * 1.0 + this.scrollY * -0.002;
 
@@ -579,11 +581,14 @@ export class VoidScene {
     this.crystal.position.x = shift * (this.portrait ? 0.9 : 3.9);
     this.crystal.position.z = shift * -1.4;
 
-    // camera: dolly through the rite, drift with the pointer after it
+    // camera: dolly through the rite, drift with the pointer after it,
+    // and never hold perfectly still — a handheld stillness, breathing
+    const breatheX = Math.sin(t * 0.11) * 0.05;
+    const breatheY = Math.cos(t * 0.087) * 0.04;
     const dolly = 15 - p * 6.2 - shift * 0.6 + (this.portrait ? shift * 1.6 : 0);
     this.camera.position.z += (dolly - this.camera.position.z) * 0.03;
-    this.camera.position.x += (this.mouse.x * 0.55 - this.camera.position.x) * 0.03;
-    this.camera.position.y += (-this.mouse.y * 0.4 - this.scrollY * 0.0012 - this.camera.position.y) * 0.03;
+    this.camera.position.x += (this.mouse.x * 0.55 + breatheX - this.camera.position.x) * 0.03;
+    this.camera.position.y += (-this.mouse.y * 0.4 + breatheY - this.scrollY * 0.0012 - this.camera.position.y) * 0.03;
     this.camera.lookAt(shift * (this.portrait ? 0 : 0.9), shift * (this.portrait ? 0.5 : 0.1), 0);
 
     // starfield parallax
