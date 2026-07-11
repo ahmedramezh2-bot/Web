@@ -33,10 +33,6 @@
     <p class="preloader__whisper" id="preloader-whisper">
       <span class="preloader__whisper-line">In the beginning, there was darkness.</span>
     </p>
-    <div class="preloader__meta" aria-hidden="true">
-      <span class="preloader__label">H&thinsp;E&thinsp;B&thinsp;R&thinsp;A</span>
-      <span class="preloader__counter" id="preloader-counter">0&thinsp;0&thinsp;0</span>
-    </div>
     <div class="preloader__beam" id="preloader-beam" aria-hidden="true"></div>
     <button class="preloader__skip" id="preloader-skip" type="button">Enter</button>
   </div>
@@ -53,10 +49,16 @@
       <span class="header__status-dot"></span>
       <span class="header__status-text" id="header-section-label">001 — ORIGIN</span>
     </div>
-    <button class="header__menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
-      <span class="header__menu-label" data-open-label="MENU" data-close-label="CLOSE">MENU</span>
-      <span class="header__menu-icon" aria-hidden="true"><i></i><i></i></span>
-    </button>
+    <div class="header__actions">
+      <button class="header__sound" id="sound-btn" type="button" aria-pressed="false" aria-label="Toggle sound">
+        <span class="header__sound-label">SOUND</span>
+        <span class="header__sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      </button>
+      <button class="header__menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
+        <span class="header__menu-label" data-open-label="MENU" data-close-label="CLOSE">MENU</span>
+        <span class="header__menu-icon" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
     <span class="header__progress" id="scroll-progress" aria-hidden="true"></span>
   </header>
 
@@ -515,6 +517,16 @@
         <h2 class="section-head__title">Covenant</h2>
         <p class="section-head__note"><em>Five phases. One ascent.</em></p>
       </header>
+      <div class="ritual__sky" aria-hidden="true">
+        <svg viewBox="0 0 1000 150" preserveAspectRatio="none" fill="none">
+          <path class="ritual__path" d="M40,118 L255,52 L500,100 L745,34 L960,76" stroke="currentColor" stroke-width="1"/>
+          <g class="ritual__node" transform="translate(40,118)"><circle r="2.5" fill="currentColor"/><circle class="ritual__halo" r="9" stroke="currentColor" stroke-width="0.75"/></g>
+          <g class="ritual__node" transform="translate(255,52)"><circle r="2.5" fill="currentColor"/><circle class="ritual__halo" r="9" stroke="currentColor" stroke-width="0.75"/></g>
+          <g class="ritual__node" transform="translate(500,100)"><circle r="2.5" fill="currentColor"/><circle class="ritual__halo" r="9" stroke="currentColor" stroke-width="0.75"/></g>
+          <g class="ritual__node" transform="translate(745,34)"><circle r="2.5" fill="currentColor"/><circle class="ritual__halo" r="9" stroke="currentColor" stroke-width="0.75"/></g>
+          <g class="ritual__node" transform="translate(960,76)"><circle r="2.5" fill="currentColor"/><circle class="ritual__halo" r="9" stroke="currentColor" stroke-width="0.75"/></g>
+        </svg>
+      </div>
       <ol class="ritual__steps ritual__steps--five">
         <li class="ritual__step">
           <span class="ritual__num" aria-hidden="true">I</span>
@@ -672,6 +684,28 @@
           <span class="transmission__cta-ring" aria-hidden="true"></span>
           <span class="transmission__cta-text">Begin<br/>Transmission</span>
         </a>
+        <form class="transmit" id="transmit-form" novalidate>
+          <div class="transmit__field">
+            <input class="transmit__input" id="t-name" name="name" type="text" placeholder=" " autocomplete="name" />
+            <label class="transmit__label" for="t-name">Your name</label>
+            <span class="transmit__line" aria-hidden="true"></span>
+          </div>
+          <div class="transmit__field">
+            <input class="transmit__input" id="t-signal" name="email" type="email" placeholder=" " autocomplete="email" />
+            <label class="transmit__label" for="t-signal">Your signal — email</label>
+            <span class="transmit__line" aria-hidden="true"></span>
+          </div>
+          <div class="transmit__field">
+            <textarea class="transmit__input transmit__input--area" id="t-msg" name="message" rows="3" placeholder=" "></textarea>
+            <label class="transmit__label" for="t-msg">What world shall we build?</label>
+            <span class="transmit__line" aria-hidden="true"></span>
+          </div>
+          <p class="transmit__error" id="transmit-error" role="alert" aria-live="polite"></p>
+          <button class="transmit__send" id="transmit-send" type="submit">
+            <span class="transmit__send-text">Send the transmission</span>
+          </button>
+          <p class="transmit__note"><em>Your mail courier opens with the message composed — nothing leaves without your hand.</em></p>
+        </form>
         <p class="transmission__mail">
           <a href="mailto:studio@hebra.dev">studio@hebra.dev</a>
           <span class="transmission__sep" aria-hidden="true">/</span>

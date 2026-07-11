@@ -6,6 +6,7 @@
 import { VoidScene } from './scene-void.js';
 import { MindScene } from './scene-mind.js';
 import { EyeScene } from './scene-eye.js';
+import { HebraAudio } from './audio.js';
 
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
@@ -79,18 +80,37 @@ if (voidScene) {
 }
 
 /* ------------------------------------------------------------
+   Typography rides the camera — scroll momentum leans the
+   wordmark and the section titles, springing back to rest
+   ------------------------------------------------------------ */
+if (lenis && !prefersReducedMotion) {
+  const titleLine = $('.origin__title-line');
+  if (titleLine) {
+    const yTo = gsap.quickTo(titleLine, 'y', { duration: 0.6, ease: 'power3.out' });
+    const skewTo = gsap.quickTo(titleLine, 'skewY', { duration: 0.8, ease: 'power3.out' });
+    lenis.on('scroll', (e) => {
+      const v = Math.max(-1, Math.min(1, e.velocity / 55));
+      yTo(v * -16);
+      skewTo(v * -1.1);
+    });
+  }
+  $$('.section-head__title').forEach((title) => {
+    const xTo = gsap.quickTo(title, 'x', { duration: 0.7, ease: 'power3.out' });
+    lenis.on('scroll', (e) => {
+      const v = Math.max(-1, Math.min(1, e.velocity / 70));
+      xTo(v * 8);
+    });
+  });
+}
+
+/* ------------------------------------------------------------
    The Rite of Entry — loading sequence
    ------------------------------------------------------------ */
 const preloader = $('#preloader');
-const counterEl = $('#preloader-counter');
 const whisperEl = $('#preloader-whisper');
 const whisperLine = $('.preloader__whisper-line', preloader);
 const beam = $('#preloader-beam');
 const skipBtn = $('#preloader-skip');
-
-const THIN = ' ';
-const formatCount = (n) =>
-  String(Math.round(n)).padStart(3, '0').split('').join(THIN);
 
 let riteFinished = false;
 
@@ -113,7 +133,6 @@ function finishRite(instant = false) {
       voidScene.heroShift.value = 1;
       if (prefersReducedMotion) voidScene.renderOnce();
     }
-    counterEl.textContent = formatCount(100);
     done();
     return;
   }
@@ -162,12 +181,12 @@ function runRite() {
     });
   }
 
+  // no counters, no bars — the approaching light is the only measure
   const crawl = gsap.to(count, {
     value: 90,
     duration: crawlDur,
     ease: 'power1.inOut',
     onUpdate: () => {
-      counterEl.textContent = formatCount(count.value);
       if (voidScene) voidScene.progress.value = count.value / 100;
     },
   });
@@ -179,7 +198,6 @@ function runRite() {
         duration: 0.5,
         ease: 'power2.out',
         onUpdate: () => {
-          counterEl.textContent = formatCount(count.value);
           if (voidScene) voidScene.progress.value = count.value / 100;
         },
         onComplete: () => finishRite(false),
@@ -203,7 +221,7 @@ const heroEmblem = $('#origin-emblem');
 const heroFoot = $('.origin__foot');
 
 if (!prefersReducedMotion) {
-  gsap.set(heroLetters, { yPercent: 60, opacity: 0 });
+  gsap.set(heroLetters, { yPercent: 60, opacity: 0, filter: 'blur(14px)' });
   gsap.set([heroSub, heroWhisper, heroFoot], { opacity: 0, y: 18 });
   gsap.set(heroEmblem, { opacity: 0, scale: 0.94 });
 }
@@ -217,13 +235,35 @@ function heroIntro(instant) {
   gsap.timeline({ delay: 0.15 })
     .to(heroEmblem, { opacity: 1, scale: 1, duration: 2.2, ease: 'power3.out' })
     .to(heroLetters, {
-      yPercent: 0, opacity: 1,
-      duration: 1.4, ease: 'power4.out', stagger: 0.07,
+      yPercent: 0, opacity: 1, filter: 'blur(0px)',
+      duration: 1.6, ease: 'power4.out', stagger: 0.07,
     }, '-=1.9')
     .to(heroSub, { opacity: 1, y: 0, duration: 1.1, ease: 'power3.out' }, '-=0.8')
     .to(heroWhisper, { opacity: 1, y: 0, duration: 1.1, ease: 'power3.out' }, '-=0.85')
     .to(heroFoot, { opacity: 1, y: 0, duration: 1.1, ease: 'power3.out' }, '-=0.9');
 }
+
+/* ------------------------------------------------------------
+   The Sound of the Void — synthesized, invited, never imposed
+   ------------------------------------------------------------ */
+const audio = new HebraAudio();
+const soundBtn = $('#sound-btn');
+if (soundBtn) {
+  soundBtn.addEventListener('click', async () => {
+    const on = await audio.toggle();
+    soundBtn.setAttribute('aria-pressed', String(on));
+  });
+}
+
+// hover ticks and click tones on everything interactive
+const AUDIO_HOT = 'a, button, [data-tilt], .catalog__head, .works__row';
+document.addEventListener('pointerover', (e) => {
+  if (e.target.closest(AUDIO_HOT)) audio.tick();
+});
+document.addEventListener('click', (e) => {
+  const hot = e.target.closest(AUDIO_HOT);
+  if (hot && hot.id !== 'sound-btn') audio.click();
+});
 
 /* ------------------------------------------------------------
    Header — progress hairline, live section label, scrim
@@ -268,6 +308,7 @@ function setMenu(open) {
   menuBtn.setAttribute('aria-expanded', String(open));
   menuLabel.textContent = open ? menuLabel.dataset.closeLabel : menuLabel.dataset.openLabel;
   if (lenis) open ? lenis.stop() : lenis.start();
+  audio.whoosh(open);
 }
 
 menuBtn.addEventListener('click', () => setMenu(!menuOpen));
@@ -371,6 +412,43 @@ if (!prefersReducedMotion && $('.question__answer')) {
     });
   reveal($$('.question__because p'), { trigger: '.question__because', stagger: 0.18, y: 26 });
 }
+
+/* ------------------------------------------------------------
+   Covenant constellation — the path is drawn as you descend,
+   each phase-star waking as the line reaches it
+   ------------------------------------------------------------ */
+const ritualPath = $('.ritual__path');
+const ritualNodes = $$('.ritual__node');
+if (ritualPath && !prefersReducedMotion) {
+  const len = ritualPath.getTotalLength();
+  gsap.set(ritualPath, { strokeDasharray: len, strokeDashoffset: len });
+  gsap.to(ritualPath, {
+    strokeDashoffset: 0,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '.ritual__sky',
+      start: 'top 88%',
+      end: 'top 30%',
+      scrub: 0.4,
+      onUpdate: (self) => {
+        // stars ignite as the drawn line passes them
+        ritualNodes.forEach((node, i) => {
+          node.classList.toggle('is-revealed', self.progress >= (i + 0.5) / ritualNodes.length);
+        });
+      },
+    },
+  });
+} else if (ritualNodes.length) {
+  ritualNodes.forEach((n) => n.classList.add('is-revealed'));
+}
+
+// hovering a phase lights its star
+$$('.ritual__step').forEach((step, i) => {
+  const node = ritualNodes[i];
+  if (!node) return;
+  step.addEventListener('pointerenter', () => node.classList.add('is-lit'));
+  step.addEventListener('pointerleave', () => node.classList.remove('is-lit'));
+});
 
 /* ------------------------------------------------------------
    Catalog — the index of disciplines
@@ -581,6 +659,70 @@ if (cta && finePointer && !prefersReducedMotion) {
     my((e.clientY - (r.top + r.height / 2)) * 0.12);
   });
   cta.addEventListener('pointerleave', () => { mx(0); my(0); });
+}
+
+/* ------------------------------------------------------------
+   The transmission form — alive at every state
+   ------------------------------------------------------------ */
+const transmitForm = $('#transmit-form');
+if (transmitForm) {
+  const nameField = $('#t-name');
+  const signalField = $('#t-signal');
+  const msgField = $('#t-msg');
+  const errorEl = $('#transmit-error');
+  const sendBtn = $('#transmit-send');
+  const sendText = $('.transmit__send-text', sendBtn);
+
+  const complain = (field, message) => {
+    const wrap = field.closest('.transmit__field');
+    wrap.classList.add('is-invalid');
+    errorEl.textContent = message;
+    errorEl.classList.add('is-visible');
+    if (!prefersReducedMotion) {
+      gsap.fromTo(wrap, { x: 0 }, {
+        keyframes: [{ x: -7 }, { x: 6 }, { x: -4 }, { x: 2 }, { x: 0 }],
+        duration: 0.45, ease: 'power2.out',
+      });
+    }
+    field.focus();
+  };
+
+  [nameField, signalField, msgField].forEach((f) => {
+    f.addEventListener('input', () => {
+      f.closest('.transmit__field').classList.remove('is-invalid');
+      errorEl.classList.remove('is-visible');
+    });
+  });
+
+  transmitForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = nameField.value.trim();
+    const signal = signalField.value.trim();
+    const msg = msgField.value.trim();
+
+    if (!name) return complain(nameField, 'The void needs a name.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signal)) {
+      return complain(signalField, 'That signal cannot be traced. Check the address.');
+    }
+    if (!msg) return complain(msgField, 'A transmission with no message is only silence.');
+
+    sendBtn.classList.add('is-sending');
+    sendText.textContent = 'Transmitting…';
+    audio.click();
+
+    setTimeout(() => {
+      const subject = encodeURIComponent(`Transmission — ${name}`);
+      const body = encodeURIComponent(`${msg}\n\n— ${name}\n${signal}`);
+      window.location.href = `mailto:studio@hebra.dev?subject=${subject}&body=${body}`;
+      sendBtn.classList.remove('is-sending');
+      sendBtn.classList.add('is-sent');
+      sendText.textContent = 'Courier opened — awaiting your hand';
+      setTimeout(() => {
+        sendBtn.classList.remove('is-sent');
+        sendText.textContent = 'Send the transmission';
+      }, 6000);
+    }, 900);
+  });
 }
 
 /* ------------------------------------------------------------
