@@ -53,3 +53,28 @@ Deploy anywhere static — GitHub Pages, Vercel, Netlify.)
   full keyboard navigation and `prefers-reduced-motion` support.
 - The crystal, contour head and particle atmospheres are procedural
   recreations of the studio's reference imagery — no raster assets shipped.
+
+## Tuning the loading rite (Theatre.js)
+
+Open the site with `?edit` in the URL — e.g. `http://localhost:8000/?edit` —
+and a [Theatre.js](https://www.theatrejs.com) panel appears, live-wired to
+the crystal's two most cinematic parameters: `ignite` (the signal flash) and
+`heroShift` (its drift into hero orbit). Drag the sliders and the WebGL
+scene responds immediately.
+
+This is a developer-only instrument, not a visitor feature:
+
+- Regular visits (no `?edit`) never load Theatre.js. The GSAP-authored rite
+  in `assets/js/main.js` remains the only thing a visitor experiences —
+  nothing about the default site changed.
+- `?edit` skips the auto-playing rite (so the crystal is on stage
+  immediately) and hands `ignite`/`heroShift` to the panel instead.
+- Studio's own project menu has an **Export** action that saves a
+  `state.json`. Drop it at `assets/theatre/hebra-state.json` and
+  `theatre-rite.js` will load it as the new baked default next time
+  edit mode runs.
+
+The runtime is vendored, not installed via npm — see
+`assets/js/vendor/theatre/` (built from the
+[theatre-js/theatre](https://github.com/theatre-js/theatre) monorepo's
+`@theatre/browser-bundles` package, Apache-2.0, license included alongside).
