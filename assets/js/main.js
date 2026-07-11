@@ -13,6 +13,7 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 const lowPower = !finePointer || window.innerWidth < 768;
+const editMode = new URLSearchParams(window.location.search).has('edit');
 
 // sessionStorage can throw (private modes, file://) — never let it take the site down
 const store = {
@@ -613,6 +614,21 @@ window.addEventListener('resize', () => {
 });
 
 /* ------------------------------------------------------------
-   Begin.
+   Theatre.js — the tuning instrument, ?edit only
+   ------------------------------------------------------------
+   Never loaded for a real visitor. Skips straight past the rite
+   so the crystal is on stage immediately, then hands its two
+   most cinematic parameters to a live Theatre.js panel.
    ------------------------------------------------------------ */
-runRite();
+if (editMode && voidScene) {
+  document.documentElement.classList.add('theatre-edit-mode');
+  finishRite(true);
+  import('./theatre-rite.js')
+    .then(({ initTheatreRite }) => initTheatreRite({ voidScene }))
+    .catch((err) => console.warn('HEBRA: the tuning panel stayed dark.', err));
+} else {
+  /* ------------------------------------------------------------
+     Begin.
+     ------------------------------------------------------------ */
+  runRite();
+}
