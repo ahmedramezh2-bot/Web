@@ -62,9 +62,10 @@ export default function App() {
     <>
       <Stage />
       <main className="surface" id="journey" aria-label="HEBRA">
-        {/* Chapters' DOM counterparts mount here in later phases.
-            A tall runway lets scroll physics be felt and tested. */}
-        <div style={{ height: '400vh' }} aria-hidden="true" />
+        {/* The journey runway: scroll distance = travel distance
+            through the world. Chapters' DOM counterparts mount here
+            in later phases. */}
+        <div style={{ height: '900vh' }} aria-hidden="true" />
       </main>
       {import.meta.env.DEV && <DevHud />}
     </>

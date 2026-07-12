@@ -11,11 +11,30 @@
  * attempted.
  */
 
+/** Pose provider for future spatial audio — the listener rides the camera. */
+export type ListenerPose = { x: number; y: number; z: number } | null;
+
 class AudioSystemImpl {
   enabled = false;
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private lastTick = 0;
+  private poseProvider: (() => ListenerPose) | null = null;
+
+  /**
+   * Spatial audio architecture (Phase 2: preparation only).
+   * The world registers a pose provider; when object voices arrive in
+   * a later phase, each will be a PannerNode positioned in world
+   * space while the AudioListener follows this pose.
+   */
+  prepareSpatial(provider: () => ListenerPose): void {
+    this.poseProvider = provider;
+  }
+
+  /** Current listener pose, for future PannerNode placement. */
+  listenerPose(): ListenerPose {
+    return this.poseProvider?.() ?? null;
+  }
 
   private ensure(): void {
     if (this.ctx) return;
