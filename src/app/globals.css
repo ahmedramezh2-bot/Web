@@ -1,0 +1,18 @@
+/* Baseline document reset only — no design decisions belong here.
+   Typography, color, and spacing are Typography/Color/Design Token
+   Bible territory, out of scope until their owning milestones. */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}

@@ -1,24 +1,43 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "isolatedModules": true,
     "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "allowJs": false,
     "noEmit": true,
+    "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@world/*": ["src/world/*"],
+      "@camera/*": ["src/camera/*"],
+      "@cinematic/*": ["src/cinematic/*"],
+      "@audio/*": ["src/audio/*"],
+      "@interaction/*": ["src/interaction/*"],
+      "@quality/*": ["src/quality/*"],
+      "@performance/*": ["src/performance/*"],
+      "@state/*": ["src/state/*"],
+      "@content/*": ["src/content/*"],
+      "@tokens/*": ["src/design-tokens/*"],
+      "@glyphs/*": ["src/glyphs/*"],
+      "@materials/*": ["src/materials/*"],
+      "@shaders/*": ["src/shaders/*"],
+      "@components/*": ["src/components/*"],
+      "@lib/*": ["src/lib/*"]
     }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }
