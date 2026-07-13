@@ -8,9 +8,14 @@ import { InteractionBridge } from '@interaction/InteractionBridge';
 import { QUALITY_TIER_PROFILES } from '@quality/tiers';
 import { useQualityStore } from '@state/qualityStore';
 
+import { createLogger } from '@lib/logger';
+
 import { FrameMonitorBridge } from './FrameMonitorBridge';
 import { WorldSystemsBridge } from './WorldSystemsBridge';
 import { configureRenderer } from './renderer';
+import { isWebGlSupported } from './webglSupport';
+
+const logger = createLogger('HebraCanvas');
 
 /**
  * The single persistent R3F Canvas.
@@ -26,6 +31,13 @@ import { configureRenderer } from './renderer';
 export function HebraCanvas() {
   const tier = useQualityStore((state) => state.tier);
   const tierProfile = QUALITY_TIER_PROFILES[tier ?? 'balanced'];
+
+  // No WebGL, no canvas — the Threshold Shell underneath stays, the
+  // engine keeps running, and nothing throws. See webglSupport.ts.
+  if (!isWebGlSupported()) {
+    logger.warn('WebGL unavailable — world canvas declined, threshold shell remains');
+    return null;
+  }
 
   return (
     <Canvas

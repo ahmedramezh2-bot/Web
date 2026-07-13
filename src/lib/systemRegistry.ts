@@ -13,6 +13,24 @@ import { createLogger } from './logger';
 
 const logger = createLogger('SystemRegistry');
 
+/**
+ * Yield the main thread between system inits so boot never forms one
+ * long task — input stays responsive while the engine assembles.
+ * scheduler.yield() where available (MDN: limited availability, its
+ * continuations get a boosted-priority queue); MDN's documented
+ * setTimeout(0) fallback everywhere else.
+ */
+async function yieldToMain(): Promise<void> {
+  const scheduler = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  if (scheduler?.yield) {
+    await scheduler.yield();
+    return;
+  }
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+}
+
 export interface SystemDefinition<T = unknown> {
   /** Unique, stable id — used in dependency lists and error messages. */
   readonly id: string;
@@ -85,6 +103,7 @@ export class SystemRegistry {
       } catch (cause) {
         throw new SystemInitError(id, 'init() threw', cause);
       }
+      await yieldToMain();
     }
 
     this.booted = true;

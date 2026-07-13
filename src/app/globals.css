@@ -15,6 +15,49 @@ body {
 
 body {
   overflow: hidden;
+  /* Near-black anchor (Color Bible §4) — provisional value until
+     Design Token authoring. Matches the Threshold Shell so no white
+     flash precedes first paint. */
+  background: #060608;
+}
+
+/* The Threshold Shell — the server-rendered surface under the canvas.
+   It carries first paint and the document's accessible identity; the
+   World Canvas (position: fixed, later in DOM order) covers it once
+   WebGL mounts. Near-white on near-black: Color Bible §4 anchors,
+   provisional values until Design Token authoring. */
+.hebra-threshold {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 1.5rem;
+  background: #060608;
+  color: #d4d4da;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.hebra-threshold-name {
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.6em;
+  /* Optical centering: trailing letter-spacing after the final glyph
+     shifts the wordmark left; this restores true center. */
+  margin-right: -0.6em;
+}
+
+.hebra-threshold-nature {
+  font-size: 0.95rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  max-width: 34rem;
+  color: #9a9aa4;
 }
 
 /* The scroll track is an input transducer, never a page: an invisible
