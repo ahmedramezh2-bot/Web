@@ -2,9 +2,12 @@
 
 import { useEffect, type ReactNode } from 'react';
 
+import { initAudioEngine, type AudioEngineHandle } from '@audio/audioEngine';
 import { initCameraSystem } from '@camera/cameraSystem';
+import { initAnimationEngine } from '@cinematic/animationEngine';
 import { ErrorBoundary } from '@components/system/ErrorBoundary';
 import { GestureBridge } from '@interaction/gesture/GestureBridge';
+import { initInteractionEngine } from '@interaction/interactionEngine';
 import { bootEngine, getEngine, registerSystem } from '@lib/engine';
 import { createLogger } from '@lib/logger';
 import { initMaterialSystem } from '@materials/materialSystem';
@@ -13,7 +16,9 @@ import { initShaderSystem } from '@shaders/shaderSystem';
 import { useEngineStore } from '@state/engineStore';
 import { initStoryEngine } from '@story/storyEngine';
 import { initEnvironmentEngine } from '@world/environment/environmentEngine';
+import { initFxEngine } from '@world/fx/fxEngine';
 import { initLightingSystem } from '@world/lighting/lightingSystem';
+import { initLivingWorld } from '@world/living/livingWorld';
 import { initNavigationSystem } from '@world/navigation/navigationSystem';
 import { initWorldEngine, type WorldEngineHandle } from '@world/worldEngine';
 
@@ -65,6 +70,23 @@ function registerEngineSystems(): void {
     init: () =>
       initEnvironmentEngine(getEngine().registry.get<WorldEngineHandle>('world').streaming),
   });
+  registerSystem({ id: 'animation', init: initAnimationEngine });
+  registerSystem({ id: 'interaction', init: initInteractionEngine });
+  registerSystem({
+    id: 'audio',
+    dependsOn: ['quality'],
+    init: () => initAudioEngine(getEngine().registry.get<QualitySystemHandle>('quality').tier),
+  });
+  registerSystem({
+    id: 'fx',
+    dependsOn: ['quality'],
+    init: () => initFxEngine(getEngine().registry.get<QualitySystemHandle>('quality').tier),
+  });
+  registerSystem({
+    id: 'living-world',
+    dependsOn: ['world'],
+    init: () => initLivingWorld(getEngine().registry.get<WorldEngineHandle>('world').clock),
+  });
   systemsRegistered = true;
 }
 
@@ -79,6 +101,36 @@ export function Providers({ children }: { children: ReactNode }): ReactNode {
       });
     });
   }, []);
+
+  // Audio may only start inside a user gesture (autoplay policy;
+  // Tone.start()'s documented contract). The first deliberate pointer
+  // or key input starts the engine, then the listeners retire.
+  useEffect(() => {
+    if (status !== 'ready') {
+      return;
+    }
+    const tryStartAudio = (): void => {
+      const { registry } = getEngine();
+      if (!registry.has('audio')) {
+        return;
+      }
+      void registry
+        .get<AudioEngineHandle>('audio')
+        .start()
+        .then((started) => {
+          if (started) {
+            window.removeEventListener('pointerdown', tryStartAudio);
+            window.removeEventListener('keydown', tryStartAudio);
+          }
+        });
+    };
+    window.addEventListener('pointerdown', tryStartAudio, { passive: true });
+    window.addEventListener('keydown', tryStartAudio, { passive: true });
+    return () => {
+      window.removeEventListener('pointerdown', tryStartAudio);
+      window.removeEventListener('keydown', tryStartAudio);
+    };
+  }, [status]);
 
   return (
     <ErrorBoundary>

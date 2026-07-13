@@ -4,6 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import type { WebGLRenderer } from 'three';
 
 import { CameraRigBridge } from '@camera/CameraRigBridge';
+import { InteractionBridge } from '@interaction/InteractionBridge';
 import { QUALITY_TIER_PROFILES } from '@quality/tiers';
 import { useQualityStore } from '@state/qualityStore';
 
@@ -41,6 +42,7 @@ export function HebraCanvas() {
       <FrameMonitorBridge tierProfile={tierProfile} />
       <CameraRigBridge />
       <WorldSystemsBridge />
+      <InteractionBridge />
     </Canvas>
   );
 }
