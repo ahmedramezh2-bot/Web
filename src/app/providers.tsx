@@ -6,10 +6,15 @@ import { initAudioEngine, type AudioEngineHandle } from '@audio/audioEngine';
 import { initCameraSystem } from '@camera/cameraSystem';
 import { initAnimationEngine } from '@cinematic/animationEngine';
 import { ErrorBoundary } from '@components/system/ErrorBoundary';
+import { initUiEngine } from '@components/ui/uiEngine';
+import { initContactSystem } from '@content/contactSystem';
+import { initContentSystem } from '@content/contentSystem';
 import { GestureBridge } from '@interaction/gesture/GestureBridge';
 import { initInteractionEngine } from '@interaction/interactionEngine';
+import { initAnalyticsHub } from '@lib/analytics';
 import { bootEngine, getEngine, registerSystem } from '@lib/engine';
 import { createLogger } from '@lib/logger';
+import type { StoryEngineHandle } from '@story/storyEngine';
 import { initMaterialSystem } from '@materials/materialSystem';
 import { initQualitySystem, type QualitySystemHandle } from '@quality/qualitySystem';
 import { initShaderSystem } from '@shaders/shaderSystem';
@@ -86,6 +91,22 @@ function registerEngineSystems(): void {
     id: 'living-world',
     dependsOn: ['world'],
     init: () => initLivingWorld(getEngine().registry.get<WorldEngineHandle>('world').clock),
+  });
+  registerSystem({ id: 'ui', init: initUiEngine });
+  registerSystem({ id: 'content', init: initContentSystem });
+  registerSystem({ id: 'contact', init: initContactSystem });
+  registerSystem({
+    id: 'analytics',
+    dependsOn: ['story'],
+    init: () => {
+      const hub = initAnalyticsHub();
+      // Story analytics mirror into the hub — privacy floor preserved
+      // end to end (relative session time and narrative facts only).
+      const story = getEngine().registry.get<StoryEngineHandle>('story');
+      story.analytics.attachSink((moment) => hub.record(moment.kind, moment.detail));
+      hub.installErrorReporting();
+      return hub;
+    },
   });
   systemsRegistered = true;
 }

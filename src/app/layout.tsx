@@ -16,7 +16,16 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'HEBRA',
-  description: 'HEBRA — a digital civilization. Not a website.',
+  description:
+    'HEBRA — a digital civilization. A cinematic world of design, identity, and interactive experience.',
+  openGraph: {
+    title: 'HEBRA',
+    description:
+      'HEBRA — a digital civilization. A cinematic world of design, identity, and interactive experience.',
+    type: 'website',
+    siteName: 'HEBRA',
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }): ReactNode {
