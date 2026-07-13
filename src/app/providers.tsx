@@ -5,13 +5,17 @@ import { useEffect, type ReactNode } from 'react';
 import { initCameraSystem } from '@camera/cameraSystem';
 import { ErrorBoundary } from '@components/system/ErrorBoundary';
 import { GestureBridge } from '@interaction/gesture/GestureBridge';
-import { bootEngine, registerSystem } from '@lib/engine';
+import { bootEngine, getEngine, registerSystem } from '@lib/engine';
 import { createLogger } from '@lib/logger';
-import { initQualitySystem } from '@quality/qualitySystem';
+import { initMaterialSystem } from '@materials/materialSystem';
+import { initQualitySystem, type QualitySystemHandle } from '@quality/qualitySystem';
+import { initShaderSystem } from '@shaders/shaderSystem';
 import { useEngineStore } from '@state/engineStore';
 import { initStoryEngine } from '@story/storyEngine';
+import { initEnvironmentEngine } from '@world/environment/environmentEngine';
+import { initLightingSystem } from '@world/lighting/lightingSystem';
 import { initNavigationSystem } from '@world/navigation/navigationSystem';
-import { initWorldEngine } from '@world/worldEngine';
+import { initWorldEngine, type WorldEngineHandle } from '@world/worldEngine';
 
 /**
  * Global Providers.
@@ -40,6 +44,27 @@ function registerEngineSystems(): void {
   registerSystem({ id: 'camera', dependsOn: ['navigation'], init: initCameraSystem });
   registerSystem({ id: 'story', dependsOn: ['navigation'], init: initStoryEngine });
   registerSystem({ id: 'world', dependsOn: ['navigation', 'story'], init: initWorldEngine });
+  registerSystem({
+    id: 'lighting',
+    dependsOn: ['quality'],
+    init: () => initLightingSystem(getEngine().registry.get<QualitySystemHandle>('quality').tier),
+  });
+  registerSystem({
+    id: 'materials',
+    dependsOn: ['quality'],
+    init: () => initMaterialSystem(getEngine().registry.get<QualitySystemHandle>('quality').tier),
+  });
+  registerSystem({
+    id: 'shaders',
+    dependsOn: ['quality'],
+    init: () => initShaderSystem(getEngine().registry.get<QualitySystemHandle>('quality').tier),
+  });
+  registerSystem({
+    id: 'environment',
+    dependsOn: ['world'],
+    init: () =>
+      initEnvironmentEngine(getEngine().registry.get<WorldEngineHandle>('world').streaming),
+  });
   systemsRegistered = true;
 }
 

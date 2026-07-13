@@ -8,6 +8,7 @@ import { QUALITY_TIER_PROFILES } from '@quality/tiers';
 import { useQualityStore } from '@state/qualityStore';
 
 import { FrameMonitorBridge } from './FrameMonitorBridge';
+import { WorldSystemsBridge } from './WorldSystemsBridge';
 import { configureRenderer } from './renderer';
 
 /**
@@ -39,6 +40,7 @@ export function HebraCanvas() {
     >
       <FrameMonitorBridge tierProfile={tierProfile} />
       <CameraRigBridge />
+      <WorldSystemsBridge />
     </Canvas>
   );
 }
