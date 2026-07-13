@@ -338,6 +338,10 @@ Only HEBRA should remain.
 
 ====================================================
 
+[Editorial note, added under the Official Research Policy: this Appendix governs creative and design inspiration sourcing (art, film, architecture, museums, web design references). For technical/API research specifically — React, Next.js, Three.js, R3F, and the rest of the stack — the approved source list, priority order, and community-resource scope limit now live in the AI Development Protocol §5 (`docs/bible/15`), which this Appendix's own research discipline extends to technical implementation.]
+
+====================================================
+
 THIS PROTOCOL IS PERMANENT.
 
 Research deeply.

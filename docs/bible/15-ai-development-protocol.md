@@ -66,11 +66,16 @@ This restriction list is read literally and without exception. Where a task appe
 
 AI must always research before answering.
 
-**Priority order:** Official Documentation → Academic Sources → Vendor Documentation → Engine Documentation → Production Standards → only then, Community Knowledge.
+**Priority order (amended — Official Research Policy, in force from this point forward for every implementation milestone):**
+
+1. **HEBRA Constitution Version 1.0** — outranks official documentation itself. Where the Constitution has already decided something (a library's responsibility per Development Standards §6, a budget per Appendix F, a naming term per docs/bible/26), that decision is never reopened by consulting outside documentation, however authoritative — outside sources inform *how* to implement a Constitution decision, never *whether* to follow it.
+2. **Official Documentation** — the approved primary-source list: React, Next.js, TypeScript, Three.js, React Three Fiber, drei, Theatre.js, GSAP, Lenis, Zustand, React Bits, three-mesh-bvh, Tone.js, Zod, Figma, WebGL, WebGPU (where applicable), MDN Web Docs, W3C Specifications.
+3. **Production best practices** — patterns documented by the libraries' own maintainers or standards bodies as recommended practice, distinct from a specific API reference page.
+4. **Community resources** — lowest priority, and scope-limited: usable only to understand *implementation detail* (how a documented API is typically wired up), never as *architectural authority*. A blog post, forum answer, or tutorial may never be the reason a HEBRA architectural decision was made; at most it clarifies how an already-decided, already-documented approach is mechanically expressed. Random blog posts, YouTube tutorials, and unofficial examples are never cited as the basis for an architecture decision.
 
 **Never rely on assumptions.** This restates, at the level of AI behavior specifically, the standing discipline already established across every other Bible's Research section (cross-reference Appendix E, and the Research sections of the Camera, Lighting, Material, World Blueprint, Animation, FX, Audio, Asset Production, and UI Integration Bibles) — AI's research obligation is not a new rule, it is the existing Constitution-wide rule applied explicitly to AI-originated work.
 
-Where authoritative sources conflict or are silent, AI states that gap explicitly rather than filling it with a plausible-sounding but unverified claim (cross-reference §1's Ethics clause on fabricated sources).
+Where authoritative sources conflict or are silent, AI states that gap explicitly rather than filling it with a plausible-sounding but unverified claim (cross-reference §1's Ethics clause on fabricated sources). Per this section's amended priority order, a conflict between the Constitution and official documentation is not actually a conflict to weigh — the Constitution wins outright, and the disagreement is logged (per the Constitution Review Protocol's Contradiction Detection, `docs/bible/16` §5) as a signal the Constitution may need a deliberate, human-approved amendment, never as license to quietly follow the outside source instead.
 
 ====================================================
 
