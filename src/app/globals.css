@@ -16,3 +16,26 @@ body {
 body {
   overflow: hidden;
 }
+
+/* The scroll track is an input transducer, never a page: an invisible
+   scrollable surface Lenis reads physical wheel/touch gestures from.
+   It sits above the canvas to receive input; the world below renders
+   independently of it. See src/interaction/scroll/scrollSystem.ts. */
+.hebra-scroll-track {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hebra-scroll-track::-webkit-scrollbar {
+  display: none;
+}
+
+.hebra-scroll-track-content {
+  width: 100%;
+  pointer-events: none;
+}

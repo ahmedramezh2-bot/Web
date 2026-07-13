@@ -3,6 +3,7 @@
 import { Canvas } from '@react-three/fiber';
 import type { WebGLRenderer } from 'three';
 
+import { CameraRigBridge } from '@camera/CameraRigBridge';
 import { QUALITY_TIER_PROFILES } from '@quality/tiers';
 import { useQualityStore } from '@state/qualityStore';
 
@@ -37,6 +38,7 @@ export function HebraCanvas() {
       dpr={[1, tierProfile.maxPixelRatio]}
     >
       <FrameMonitorBridge tierProfile={tierProfile} />
+      <CameraRigBridge />
     </Canvas>
   );
 }

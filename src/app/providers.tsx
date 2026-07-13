@@ -2,11 +2,14 @@
 
 import { useEffect, type ReactNode } from 'react';
 
+import { initCameraSystem } from '@camera/cameraSystem';
 import { ErrorBoundary } from '@components/system/ErrorBoundary';
+import { GestureBridge } from '@interaction/gesture/GestureBridge';
 import { bootEngine, registerSystem } from '@lib/engine';
 import { createLogger } from '@lib/logger';
 import { initQualitySystem } from '@quality/qualitySystem';
 import { useEngineStore } from '@state/engineStore';
+import { initNavigationSystem } from '@world/navigation/navigationSystem';
 
 /**
  * Global Providers.
@@ -31,6 +34,8 @@ function registerEngineSystems(): void {
     return;
   }
   registerSystem({ id: 'quality', init: initQualitySystem });
+  registerSystem({ id: 'navigation', init: initNavigationSystem });
+  registerSystem({ id: 'camera', dependsOn: ['navigation'], init: initCameraSystem });
   systemsRegistered = true;
 }
 
@@ -48,6 +53,7 @@ export function Providers({ children }: { children: ReactNode }): ReactNode {
 
   return (
     <ErrorBoundary>
+      <GestureBridge />
       <EngineStatusGate status={status}>{children}</EngineStatusGate>
     </ErrorBoundary>
   );
