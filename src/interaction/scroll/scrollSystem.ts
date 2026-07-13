@@ -34,6 +34,8 @@ const LENIS_LERP = 0.09;
 export interface ScrollSystemHandle {
   /** Latest normalized scroll progress 0..1 straight from Lenis. */
   readonly getProgress: () => number;
+  /** Advance Lenis's internal clock — called by the navigation system's shared-ticker subscription (official Lenis rAF integration, driven by the app's one loop instead of a private one). */
+  readonly raf: (timeMs: number) => void;
   readonly dispose: () => void;
 }
 
@@ -70,19 +72,12 @@ export function initScrollSystem(): ScrollSystemHandle {
     }
   });
 
-  let rafId = 0;
-  const raf = (time: number): void => {
-    lenis.raf(time);
-    rafId = requestAnimationFrame(raf);
-  };
-  rafId = requestAnimationFrame(raf);
-
   logger.info('scroll system initialized', { trackLengthVh: TRACK_LENGTH_VH });
 
   return {
     getProgress: () => progress,
+    raf: (timeMs) => lenis.raf(timeMs),
     dispose: () => {
-      cancelAnimationFrame(rafId);
       lenis.destroy();
       wrapper.remove();
     },

@@ -29,6 +29,7 @@
       "@quality/*": ["src/quality/*"],
       "@performance/*": ["src/performance/*"],
       "@state/*": ["src/state/*"],
+      "@story/*": ["src/story/*"],
       "@content/*": ["src/content/*"],
       "@tokens/*": ["src/design-tokens/*"],
       "@glyphs/*": ["src/glyphs/*"],

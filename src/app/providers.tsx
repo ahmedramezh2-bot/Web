@@ -9,7 +9,9 @@ import { bootEngine, registerSystem } from '@lib/engine';
 import { createLogger } from '@lib/logger';
 import { initQualitySystem } from '@quality/qualitySystem';
 import { useEngineStore } from '@state/engineStore';
+import { initStoryEngine } from '@story/storyEngine';
 import { initNavigationSystem } from '@world/navigation/navigationSystem';
+import { initWorldEngine } from '@world/worldEngine';
 
 /**
  * Global Providers.
@@ -36,6 +38,8 @@ function registerEngineSystems(): void {
   registerSystem({ id: 'quality', init: initQualitySystem });
   registerSystem({ id: 'navigation', init: initNavigationSystem });
   registerSystem({ id: 'camera', dependsOn: ['navigation'], init: initCameraSystem });
+  registerSystem({ id: 'story', dependsOn: ['navigation'], init: initStoryEngine });
+  registerSystem({ id: 'world', dependsOn: ['navigation', 'story'], init: initWorldEngine });
   systemsRegistered = true;
 }
 
