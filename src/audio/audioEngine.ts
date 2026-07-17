@@ -76,6 +76,10 @@ export function initAudioEngine(initialTier: QualityTier): AudioEngineHandle {
 
   const zoneBuilders = new Map<string, AmbientZoneBuilder>();
   const zones = new Map<string, AmbientZoneHandle>();
+  // Levels requested before the gesture-gated start (or before a
+  // zone's builder registers) are remembered and applied when the bed
+  // actually exists — narrative intent must survive the audio gate.
+  const desiredLevels = new Map<string, { level: number; fadeSeconds: number }>();
 
   const instantiateZones = (): void => {
     if (!tone || !buses) {
@@ -83,7 +87,12 @@ export function initAudioEngine(initialTier: QualityTier): AudioEngineHandle {
     }
     for (const [regionId, builder] of zoneBuilders) {
       if (!zones.has(regionId)) {
-        zones.set(regionId, builder(tone, buses.ambient));
+        const zone = builder(tone, buses.ambient);
+        zones.set(regionId, zone);
+        const desired = desiredLevels.get(regionId);
+        if (desired) {
+          zone.setLevel(desired.level, desired.fadeSeconds);
+        }
       }
     }
   };
@@ -136,6 +145,7 @@ export function initAudioEngine(initialTier: QualityTier): AudioEngineHandle {
       };
     },
     setZoneLevel: (regionId, level, fadeSeconds) => {
+      desiredLevels.set(regionId, { level, fadeSeconds });
       zones.get(regionId)?.setLevel(level, fadeSeconds);
     },
     setListenerPose: (px, py, pz, fx, fy, fz) => {
@@ -160,6 +170,7 @@ export function initAudioEngine(initialTier: QualityTier): AudioEngineHandle {
       }
       zones.clear();
       zoneBuilders.clear();
+      desiredLevels.clear();
       buses?.master.dispose();
       buses = undefined;
     },

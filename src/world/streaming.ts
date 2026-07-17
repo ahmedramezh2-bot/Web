@@ -46,6 +46,17 @@ export class StreamingManager {
 
   public registerContent(regionId: string, handlers: RegionContentHandlers): () => void {
     this.handlers.set(regionId, handlers);
+    // The window may have admitted this region before its content
+    // existed (boot yields the main thread between systems, so a frame
+    // can tick streaming before content registration). A region already
+    // loading/loaded at registration time ran with no handlers — re-run
+    // the load so late-registered content still materializes.
+    const region = REGIONS.find((entry) => entry.id === regionId);
+    const state = this.stateOf(regionId);
+    if (region && (state === 'loaded' || state === 'loading')) {
+      this.aborters.get(regionId)?.abort();
+      this.beginLoad(region);
+    }
     return () => {
       this.handlers.delete(regionId);
     };
@@ -80,27 +91,38 @@ export class StreamingManager {
     this.aborters.set(region.id, aborter);
     const handlers = this.handlers.get(region.id);
 
+    // A superseded (aborted) load may only write state while it is
+    // still the region's current operation — otherwise it would clobber
+    // the state a newer load has already set.
+    const settleAborted = (): void => {
+      if (this.aborters.get(region.id) === aborter) {
+        this.states.set(region.id, 'unloaded');
+      }
+    };
+
     this.enqueue(region.id, async () => {
       if (aborter.signal.aborted) {
-        this.states.set(region.id, 'unloaded');
+        settleAborted();
         return;
       }
       try {
         await handlers?.load?.(aborter.signal);
         if (aborter.signal.aborted) {
-          this.states.set(region.id, 'unloaded');
+          settleAborted();
           return;
         }
         this.states.set(region.id, 'loaded');
         this.emitter.emit('region-loaded', { regionId: region.id });
       } catch (cause) {
-        this.states.set(region.id, 'unloaded');
-        if (!aborter.signal.aborted) {
-          logger.error('region load failed', {
-            regionId: region.id,
-            message: cause instanceof Error ? cause.message : String(cause),
-          });
+        if (aborter.signal.aborted) {
+          settleAborted();
+          return;
         }
+        this.states.set(region.id, 'unloaded');
+        logger.error('region load failed', {
+          regionId: region.id,
+          message: cause instanceof Error ? cause.message : String(cause),
+        });
       }
     });
   }

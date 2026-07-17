@@ -85,7 +85,13 @@ export function announce(message: string): void {
     liveRegion.style.whiteSpace = 'nowrap';
     document.body.appendChild(liveRegion);
   }
-  // Clearing first re-triggers announcement of identical consecutive messages.
+  // Clear, then set on a separate task: assistive tech coalesces
+  // same-task mutations, so a synchronous clear+set of an identical
+  // message would not re-announce. The delay is imperceptible.
   liveRegion.textContent = '';
-  liveRegion.textContent = message;
+  window.setTimeout(() => {
+    if (liveRegion) {
+      liveRegion.textContent = message;
+    }
+  }, 30);
 }

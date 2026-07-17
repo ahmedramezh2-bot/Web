@@ -281,7 +281,11 @@ export function registerWorldEnvironments(deps: WorldEnvironmentDeps): void {
     // hard light from above (Lighting Bible §8).
     const shaft = new PointLight(0xdfeaff, 30, 140, 2);
     shaft.position.set(0, 46, 198);
-    resources.light(lighting, shaft, true);
+    // wantsShadow: false — the renderer's shadow-map pass is off and
+    // no receiving surfaces exist yet; requesting a shadow the scene
+    // cannot render would misstate the budget (Lighting Bible §7
+    // shadow authoring arrives with receiving architecture).
+    resources.light(lighting, shaft, false);
 
     return resources.cleanup();
   });
@@ -325,7 +329,7 @@ export function registerWorldEnvironments(deps: WorldEnvironmentDeps): void {
     // The central source the structures rotate around (02:12).
     const heart = new PointLight(0xffe8c8, 24, 120, 2);
     heart.position.copy(center);
-    resources.light(lighting, heart, true);
+    resources.light(lighting, heart, false);
 
     return resources.cleanup();
   });
@@ -502,7 +506,7 @@ export function registerWorldEnvironments(deps: WorldEnvironmentDeps): void {
     // entire experience (Lighting Bible §8).
     const originLight = new PointLight(0xfff6e8, 60, 200, 1.8);
     originLight.position.set(0, 0, 0);
-    resources.light(lighting, originLight, true);
+    resources.light(lighting, originLight, false);
 
     return resources.cleanup();
   });

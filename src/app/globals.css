@@ -131,3 +131,12 @@ body {
     font-size: 1.05rem;
   }
 }
+
+/* Reduced motion is an authored branch (Camera Bible §16): sentences
+   still fade — opacity only, no movement — but briefly, so nothing
+   lingers in slow transition for visitors who asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .hebra-sentence {
+    transition-duration: 0.4s;
+  }
+}

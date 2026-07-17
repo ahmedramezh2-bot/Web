@@ -32,28 +32,34 @@ function buildBed(tone: ToneModule, destination: ToneGain, config: BedConfig): A
   const bedGain = new tone.Gain(0).connect(destination);
   const disposables: Array<{ dispose: () => void }> = [bedGain];
 
+  // The pulse lives on its own stage in series, so the heartbeat's LFO
+  // never fights the bed's level control — bedGain.gain belongs to
+  // setLevel exclusively, pulseGain.gain to the LFO exclusively.
+  let sourceBus: ToneGain = bedGain;
+  if (config.pulseHz !== undefined) {
+    // "An almost inaudible heartbeat. Not human. Ancient." — the LFO
+    // breathes the bed's amplitude around its resting level.
+    const pulseGain = new tone.Gain(1).connect(bedGain);
+    const lfo = new tone.LFO({ frequency: config.pulseHz, min: 0.6, max: 1 });
+    lfo.connect(pulseGain.gain);
+    lfo.start();
+    disposables.push(pulseGain, lfo);
+    sourceBus = pulseGain;
+  }
+
   for (const [frequency, gain] of config.drones) {
-    const droneGain = new tone.Gain(gain).connect(bedGain);
+    const droneGain = new tone.Gain(gain).connect(sourceBus);
     const oscillator = new tone.Oscillator({ frequency, type: 'sine' }).connect(droneGain);
     oscillator.start();
     disposables.push(droneGain, oscillator);
   }
 
   if (config.air) {
-    const airGain = new tone.Gain(config.air.gain).connect(bedGain);
+    const airGain = new tone.Gain(config.air.gain).connect(sourceBus);
     const filter = new tone.Filter(config.air.cutoff, 'lowpass').connect(airGain);
     const noise = new tone.Noise('brown').connect(filter);
     noise.start();
     disposables.push(airGain, filter, noise);
-  }
-
-  if (config.pulseHz !== undefined) {
-    // "An almost inaudible heartbeat. Not human. Ancient." — the LFO
-    // breathes the whole bed's amplitude around its resting level.
-    const lfo = new tone.LFO({ frequency: config.pulseHz, min: 0.6, max: 1 });
-    lfo.connect(bedGain.gain);
-    lfo.start();
-    disposables.push(lfo);
   }
 
   return {
