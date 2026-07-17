@@ -10,9 +10,8 @@ import { CHAPTER_IDS, type ChapterId } from '@story/chapters';
  * Regions are the Main Path's Physical Locations; Zones are the six
  * post-Origin Discipline Zones. Names, kinds, chapter assignments and
  * Dialect assignments are constitutional data transcribed from
- * docs/bible/26 — never invented here. Spatial extents and progress
- * spans are infrastructure defaults, explicitly provisional until
- * world authoring (M8/M9 content) assigns real geometry.
+ * docs/bible/26 — never invented here. Progress spans are authored
+ * against the script-derived chapter timeline (see REGIONS_DATA).
  */
 
 export const DIALECT_IDS = [
@@ -34,7 +33,7 @@ const regionSchema = z.object({
   kind: z.literal('region'),
   chapter: z.enum(CHAPTER_IDS),
   dialects: z.array(z.enum(DIALECT_IDS)).min(1),
-  /** Main Path progress span [start, end] — provisional equal-split defaults. */
+  /** Main Path progress span [start, end], tiling the owning chapter's span. */
   span: z.tuple([z.number().min(0).max(1), z.number().min(0).max(1)]),
 });
 
@@ -51,7 +50,14 @@ export type Region = z.infer<typeof regionSchema>;
 export type Zone = z.infer<typeof zoneSchema>;
 export type WorldNode = Region | Zone;
 
-/** Level 2 Main Path locations, per docs/bible/26 §3. Spans provisional. */
+/**
+ * Level 2 Main Path locations, per docs/bible/26 §3. Spans are
+ * authored against the script-derived chapter spans in
+ * `@story/chapters` (Part 1's 00:00–04:00 timeline): each region
+ * tiles its owning chapter's span, with the connective Energy Stream
+ * carrying the second half of Fragments toward the Origin exactly as
+ * docs/bible/26 §3 marks it ("Fragments → Origin (connective)").
+ */
 const REGIONS_DATA: readonly Region[] = [
   {
     id: 'starfield-reach',
@@ -59,7 +65,7 @@ const REGIONS_DATA: readonly Region[] = [
     kind: 'region',
     chapter: 'void',
     dialects: ['vast'],
-    span: [0, 0.083],
+    span: [0, 0.125],
   },
   {
     id: 'cosmic-dust-field',
@@ -67,7 +73,7 @@ const REGIONS_DATA: readonly Region[] = [
     kind: 'region',
     chapter: 'void',
     dialects: ['vast'],
-    span: [0.083, 1 / 6],
+    span: [0.125, 0.25],
   },
   {
     id: 'monument-range',
@@ -75,7 +81,7 @@ const REGIONS_DATA: readonly Region[] = [
     kind: 'region',
     chapter: 'monument',
     dialects: ['reverent'],
-    span: [1 / 6, 0.25],
+    span: [0.25, 0.375],
   },
   {
     id: 'sentinel-ring',
@@ -83,7 +89,7 @@ const REGIONS_DATA: readonly Region[] = [
     kind: 'region',
     chapter: 'monument',
     dialects: ['reverent'],
-    span: [0.25, 2 / 6],
+    span: [0.375, 0.5],
   },
   {
     id: 'crystal-garden',
@@ -91,7 +97,7 @@ const REGIONS_DATA: readonly Region[] = [
     kind: 'region',
     chapter: 'fragments',
     dialects: ['generative'],
-    span: [2 / 6, 0.417],
+    span: [0.5, 0.625],
   },
   {
     id: 'energy-stream',
@@ -99,7 +105,7 @@ const REGIONS_DATA: readonly Region[] = [
     kind: 'region',
     chapter: 'fragments',
     dialects: ['active'],
-    span: [0.417, 3 / 6],
+    span: [0.625, 0.75],
   },
   {
     id: 'origin-core',
@@ -107,7 +113,7 @@ const REGIONS_DATA: readonly Region[] = [
     kind: 'region',
     chapter: 'origin',
     dialects: ['genesis'],
-    span: [3 / 6, 4 / 6],
+    span: [0.75, 0.875],
   },
   {
     id: 'distant-heart',
@@ -115,7 +121,7 @@ const REGIONS_DATA: readonly Region[] = [
     kind: 'region',
     chapter: 'awakening',
     dialects: ['recollective'],
-    span: [4 / 6, 5 / 6],
+    span: [0.875, 0.9375],
   },
   {
     id: 'rising-gate',
@@ -123,7 +129,7 @@ const REGIONS_DATA: readonly Region[] = [
     kind: 'region',
     chapter: 'threshold',
     dialects: ['vast', 'genesis'],
-    span: [5 / 6, 1],
+    span: [0.9375, 1],
   },
 ];
 

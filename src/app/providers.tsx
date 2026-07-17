@@ -25,7 +25,17 @@ import { initFxEngine } from '@world/fx/fxEngine';
 import { initLightingSystem } from '@world/lighting/lightingSystem';
 import { initLivingWorld } from '@world/living/livingWorld';
 import { initNavigationSystem } from '@world/navigation/navigationSystem';
+import { initWorldContent } from '@world/worldContent';
 import { initWorldEngine, type WorldEngineHandle } from '@world/worldEngine';
+
+import type { AudioEngineHandle as AudioHandle } from '@audio/audioEngine';
+import type { CameraSystemHandle } from '@camera/cameraSystem';
+import { NarrativeSentences } from '@components/ui/NarrativeSentences';
+import type { MaterialSystemHandle } from '@materials/materialSystem';
+import type { ShaderSystemHandle } from '@shaders/shaderSystem';
+import type { EnvironmentEngineHandle } from '@world/environment/environmentEngine';
+import type { FxEngineHandle } from '@world/fx/fxEngine';
+import type { LightingSystemHandle } from '@world/lighting/lightingSystem';
 
 /**
  * Global Providers.
@@ -92,6 +102,36 @@ function registerEngineSystems(): void {
     dependsOn: ['world'],
     init: () => initLivingWorld(getEngine().registry.get<WorldEngineHandle>('world').clock),
   });
+  // Phase H — everything authored registers through one system, after
+  // every infrastructure system it plugs into.
+  registerSystem({
+    id: 'world-content',
+    dependsOn: [
+      'environment',
+      'materials',
+      'shaders',
+      'fx',
+      'lighting',
+      'audio',
+      'camera',
+      'story',
+      'world',
+    ],
+    init: () => {
+      const { registry } = getEngine();
+      return initWorldContent({
+        environment: registry.get<EnvironmentEngineHandle>('environment'),
+        materials: registry.get<MaterialSystemHandle>('materials'),
+        shaders: registry.get<ShaderSystemHandle>('shaders'),
+        fx: registry.get<FxEngineHandle>('fx'),
+        lighting: registry.get<LightingSystemHandle>('lighting'),
+        audio: registry.get<AudioHandle>('audio'),
+        camera: registry.get<CameraSystemHandle>('camera'),
+        story: registry.get<StoryEngineHandle>('story'),
+        world: registry.get<WorldEngineHandle>('world'),
+      });
+    },
+  });
   registerSystem({ id: 'ui', init: initUiEngine });
   registerSystem({ id: 'content', init: initContentSystem });
   registerSystem({ id: 'contact', init: initContactSystem });
@@ -156,7 +196,10 @@ export function Providers({ children }: { children: ReactNode }): ReactNode {
   return (
     <ErrorBoundary>
       <GestureBridge />
-      <EngineStatusGate status={status}>{children}</EngineStatusGate>
+      <EngineStatusGate status={status}>
+        {children}
+        <NarrativeSentences />
+      </EngineStatusGate>
     </ErrorBoundary>
   );
 }

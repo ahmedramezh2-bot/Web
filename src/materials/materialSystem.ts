@@ -105,6 +105,9 @@ export function initMaterialSystem(initialTier: QualityTier): MaterialSystemHand
       }
       const material = new MeshPhysicalMaterial();
       material.name = key;
+      // Ownership marker: the environment engine's disposeSubtree skips
+      // shared materials — this cache disposes them, on last release.
+      material.userData['sharedOwnership'] = true;
       configure(material, profile);
       cache.set(key, { material, refCount: 1 });
       return material;

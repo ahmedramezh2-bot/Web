@@ -82,3 +82,52 @@ body {
   width: 100%;
   pointer-events: none;
 }
+
+/* The journey's written sentences — the only text inside the world
+   (script 00:55). Emerge/dissolve durations follow the Animation
+   Bible's authored curves; the whisper register (03:30) sits softer
+   and smaller than the written sentences. */
+.hebra-sentence-stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  padding: 2rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hebra-sentence {
+  max-width: 36rem;
+  text-align: center;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 300;
+  font-size: 1.35rem;
+  letter-spacing: 0.14em;
+  line-height: 1.9;
+  color: #e8e6df;
+  opacity: 0;
+  transition: opacity 2.6s cubic-bezier(0.32, 0, 0.16, 1);
+  text-shadow: 0 0 24px rgba(240, 236, 224, 0.35);
+}
+
+.hebra-sentence-visible {
+  opacity: 1;
+}
+
+.hebra-sentence-whisper {
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+  color: #b9b6ae;
+  text-shadow: none;
+}
+
+@media (max-width: 767px) {
+  .hebra-sentence {
+    font-size: 1.05rem;
+  }
+}

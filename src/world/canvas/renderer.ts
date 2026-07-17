@@ -49,4 +49,8 @@ export function configureRenderer(renderer: WebGLRenderer, tier: QualityTierProf
   renderer.toneMappingExposure = BASE_RENDERER_CONFIG.toneMappingExposure;
   renderer.outputColorSpace = BASE_RENDERER_CONFIG.outputColorSpace;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, tier.maxPixelRatio));
+  // Opaque near-black clear (never true black — Lighting Bible §3),
+  // matching the Threshold Shell's anchor so the canvas covers the
+  // server-rendered surface seamlessly once the world exists.
+  renderer.setClearColor(0x060608, 1);
 }

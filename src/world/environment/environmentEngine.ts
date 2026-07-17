@@ -1,4 +1,4 @@
-import { Group, Mesh, type Object3D } from 'three';
+import { Group, Mesh, Points, type Object3D } from 'three';
 
 import { createLogger } from '@lib/logger';
 
@@ -28,7 +28,16 @@ export interface EnvironmentBuildContext {
   readonly signal: AbortSignal;
 }
 
-export type EnvironmentBuilder = (context: EnvironmentBuildContext) => Promise<void> | void;
+/**
+ * A builder may return a cleanup function; it runs at unload, before
+ * the engine disposes the subtree — the place to release acquired
+ * shared materials, shader instances, and registered lights.
+ */
+export type EnvironmentCleanup = () => void;
+
+export type EnvironmentBuilder = (
+  context: EnvironmentBuildContext,
+) => Promise<EnvironmentCleanup | void> | EnvironmentCleanup | void;
 
 export interface EnvironmentEngineHandle {
   /** The one root the R3F scene mounts — regions' groups live under it. */
@@ -46,15 +55,18 @@ export interface EnvironmentEngineHandle {
  */
 export function disposeSubtree(object: Object3D): void {
   object.traverse((child) => {
-    if (child instanceof Mesh) {
+    if (child instanceof Mesh || child instanceof Points) {
       child.geometry.dispose();
       const material = child.material;
-      if (Array.isArray(material)) {
-        for (const entry of material) {
+      const entries = Array.isArray(material) ? material : [material];
+      for (const entry of entries) {
+        // Shared-ownership materials (material system's refcounted
+        // cache, shader system's tracked instances) are released by
+        // their owning system via the builder's cleanup — disposing
+        // them here would corrupt the shared caches.
+        if (entry.userData['sharedOwnership'] !== true) {
           entry.dispose();
         }
-      } else {
-        material.dispose();
       }
     }
   });
@@ -82,15 +94,21 @@ export function initEnvironmentEngine(streaming: StreamingManager): EnvironmentE
       return () => undefined;
     }
 
+    let cleanup: EnvironmentCleanup | undefined;
     const unregister = streaming.registerContent(regionId, {
       load: async (signal) => {
-        await builder({ root: group, signal });
+        const result = await builder({ root: group, signal });
+        if (typeof result === 'function') {
+          cleanup = result;
+        }
         if (!signal.aborted) {
           group.visible = true;
         }
       },
       unload: async () => {
         group.visible = false;
+        cleanup?.();
+        cleanup = undefined;
         disposeSubtree(group);
         group.clear();
       },

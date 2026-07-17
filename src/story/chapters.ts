@@ -8,10 +8,12 @@ import { ConfigValidationError } from '@lib/errors';
  *
  * The six Story Chapters, their canonical order, and their journey
  * progress spans. Names and order are constitutional and may never be
- * invented, reordered, or reinterpreted here. Progress spans are
- * infrastructure defaults — equal sixths, explicitly provisional until
- * cinematic authoring assigns real narrative pacing (a data change,
- * not a code change, when it comes).
+ * invented, reordered, or reinterpreted here. Spans are authored from
+ * Part 1's timed script (docs/bible/01-cinematic-narrative/doc-04,
+ * 00:00–04:00): Void owns the first minute, Monument the second,
+ * Fragments the third; Origin runs 03:00–03:36, Awakening 03:36–03:57,
+ * and Threshold the final rise — the script gives the later chapters
+ * progressively less clock and more weight, exactly as written.
  *
  * Validated with Zod at module init per the content/schema doctrine:
  * a malformed registry fails loud here, never silently downstream.
@@ -40,33 +42,22 @@ const chapterSchema = z.object({
 
 export type Chapter = z.infer<typeof chapterSchema>;
 
-const SIXTH = 1 / 6;
-
+/**
+ * Script minute-marks as journey fractions of the 04:00 total:
+ * Void 00:00–01:00, Monument 01:00–02:00, Fragments 02:00–03:00,
+ * Origin 03:00–03:36 (the sphere approach, entry, and interior),
+ * Awakening 03:36–03:57 (unfinished worlds completing; the first
+ * glimpse of what HEBRA creates), Threshold 03:57–04:00 held longer
+ * than its clock — the final sentences and the rise get 1/16 of the
+ * journey so the ending is never rushed off screen.
+ */
 const CHAPTERS_DATA: readonly Chapter[] = [
-  { id: 'void', order: 0, title: 'Void', emotion: 'curiosity', span: [0, SIXTH] },
-  { id: 'monument', order: 1, title: 'Monument', emotion: 'wonder', span: [SIXTH, 2 * SIXTH] },
-  {
-    id: 'fragments',
-    order: 2,
-    title: 'Fragments',
-    emotion: 'discovery',
-    span: [2 * SIXTH, 3 * SIXTH],
-  },
-  {
-    id: 'origin',
-    order: 3,
-    title: 'Origin',
-    emotion: 'understanding',
-    span: [3 * SIXTH, 4 * SIXTH],
-  },
-  {
-    id: 'awakening',
-    order: 4,
-    title: 'Awakening',
-    emotion: 'respect',
-    span: [4 * SIXTH, 5 * SIXTH],
-  },
-  { id: 'threshold', order: 5, title: 'Threshold', emotion: 'hope', span: [5 * SIXTH, 1] },
+  { id: 'void', order: 0, title: 'Void', emotion: 'curiosity', span: [0, 0.25] },
+  { id: 'monument', order: 1, title: 'Monument', emotion: 'wonder', span: [0.25, 0.5] },
+  { id: 'fragments', order: 2, title: 'Fragments', emotion: 'discovery', span: [0.5, 0.75] },
+  { id: 'origin', order: 3, title: 'Origin', emotion: 'understanding', span: [0.75, 0.875] },
+  { id: 'awakening', order: 4, title: 'Awakening', emotion: 'respect', span: [0.875, 0.9375] },
+  { id: 'threshold', order: 5, title: 'Threshold', emotion: 'hope', span: [0.9375, 1] },
 ];
 
 function validateChapters(data: readonly Chapter[]): readonly Chapter[] {

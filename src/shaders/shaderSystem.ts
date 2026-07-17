@@ -125,6 +125,9 @@ export function initShaderSystem(initialTier: QualityTier): ShaderSystemHandle {
         uniforms: { ...uniforms, ...(parameters.uniforms ?? {}) },
       });
       material.name = `shader:${id}`;
+      // Ownership marker: disposal happens through releaseMaterial,
+      // never through the environment engine's subtree sweep.
+      material.userData['sharedOwnership'] = true;
       entry.instances.add(material);
       return material;
     },

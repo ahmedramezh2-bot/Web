@@ -1,6 +1,6 @@
 {
   "name": "hebra",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0",
   "private": true,
   "description": "HEBRA — a digital civilization. Not a website.",
   "scripts": {
