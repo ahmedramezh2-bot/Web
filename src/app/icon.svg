@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Provisional HEBRA mark: the near-black / near-white anchors of
+       Color Bible §4, carrying the wordmark's initial until brand
+       asset authoring. Served via Next.js app icon file convention. -->
+  <rect width="64" height="64" rx="14" fill="#060608"/>
+  <path d="M22 18v28M42 18v28M22 32h20" stroke="#d4d4da" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>
